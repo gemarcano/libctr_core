@@ -19,10 +19,12 @@ extern "C" {
 #endif
 
 //PXI registers
-#define PXI_SYNC11 (*(uint32_t*)0x10163000)
-#define PXI_CNT11 (*(uint32_t*)0x10163004)
-#define PXI_SEND11 (*(uint32_t*)0x10163008)
-#define PXI_RECV11 (*(uint32_t*)0x1016300C)
+#define PXI_SYNC(base) (*(volatile uint32_t*)(((uintptr_t)(base)) + 0x0))
+#define PXI_CNT(base) (*(volatile uint32_t*)(((uintptr_t)(base)) + 0x4))
+#define PXI_SEND(base) (*(volatile uint32_t*)(((uintptr_t)(base)) + 0x8))
+#define PXI_RECV(base) (*(volatile uint32_t*)(((uintptr_t)(base)) + 0xC))
+
+void ctr_core_pxi_change_base(volatile uint32_t *base);
 
 /**	@brief Checks if the send PXI queue is empty.
  *
