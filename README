@@ -1,6 +1,6 @@
 ________________________________________________________________________________
 
-(Working title) libctr11
+(Working title) libctr_core
 
 Copyright 2016 Gabriel Marcano
 ________________________________________________________________________________
@@ -19,10 +19,8 @@ code borrowed from other sources.
 About
 --------------------------------------------------------------------------------
 
-This library is meant to be a collection of useful routines for ARM11 3DS
-development. The plan is for it to eventually grow to something like libnds.
-Currently the main contribution to this library is a generic disk IO framework
-that has been designed for ease of use and extensibility.
+This library is meant to be a collection of core routines used by libctr9 and
+libctr11 for ARM 3DS development.
 
 The library was meant to be linked with LTO, but due to technical limitations of
 devKitARM with GCC 5.3, it is not. Instead, it is compiled with
@@ -43,15 +41,17 @@ Dependencies
     to find it. The build tools will attempt to find it within the prefix where
     libctr11 was configured to be installed in.
 
- - libctrelf - https://github.com/gemarcano/libctrelf
-    Used for helping to parse and handle ELF data.
-
  - Autotools in general. These are used to create the build scripts.
 
 
 --------------------------------------------------------------------------------
-Compiling
+Compiling (TODO)
 --------------------------------------------------------------------------------
+
+Must be compiled separately for libctr9 and libctr11
+
+Currently, change C[9,11]FLAGS in src/Makefile.am to the correct one before
+calling configure
 
 As a suggestion, it is recommended for one to set up a fixed prefix directory
 and to store a share/config.site under the prefix. For example, if the variable
@@ -76,10 +76,18 @@ The Autotools setup assumes that devkitarm is already in the PATH.
  ./configure --host arm-none-eabi --prefix=[lib install path]
  make
 
-Example:
+Example for ARM11:
+  #first, go edit src/Makefile.am to use C11FLAGS instead of C9FLAGS
   export PATH=${PATH}:${DEVKITPRO}/bin:${DEVKITARM}/bin
   autoreconf -if
   ./configure --host arm-none-eabi --prefix="$HOME/.local/usr/arm-none-eabi-11/"
+  make -j10
+
+Example for ARM9:
+  #first, go edit src/Makefile.am to use C9FLAGS instead of C11FLAGS
+  export PATH=${PATH}:${DEVKITPRO}/bin:${DEVKITARM}/bin
+  autoreconf -if
+  ./configure --host arm-none-eabi --prefix="$HOME/.local/usr/arm-none-eabi-9/"
   make -j10
 
 
@@ -96,11 +104,6 @@ Example (after having compiled):
   #this will install to the directory specified in prefix, or /usr/local/ if
   #prefix isn't defined (most likely)!
   make install
-
-Among the files installed is an example linker script, in $prefix/share/libctr11.
-It is recommended to use this linker script to link programs that use libctr11,
-since it will make sure that libctr11's built-in crt0.o is loaded in the correct
-location and that it initializes IO.
 
 
 --------------------------------------------------------------------------------
@@ -121,17 +124,10 @@ point to the root of the prefix where libctr11 is installed. This way, it is
 easier to point to the lib and include directories (such as by using
 $CTRARM11/include and $CTRARM11/lib).
 
-No start.s or _start.s files are necessary, libctr11 has its own crt0.o built
-in. It (FIXME is supposed to) initializes the 3DS ARM11 MMU to (FIXME WHAT?).
-(FIXME This part is not done )resets the stack, and then calls libc
-initialization functions and then libctr11, then it jumps to main. It is
-recommended that any modifications to the environment be done early in main.
-
-FIXME the following isn't true yet
-
-In addition, if using libctr11's included crt0 functionality, it does support
-the __constructor__ attribute for functions. Functions with this attribute will
-be executed before the main initialization function for libctr11 is called.
+This library may be useful for others, but it is meant to be a place where
+shared code used by libctr9 and libctr11 can be placed and maintained. The
+developer recommends using one of those libraries instead of libctr_core. Those
+libraries do depend on libctr_core.
 
 
 --------------------------------------------------------------------------------
@@ -144,7 +140,7 @@ header in the include/ directory should also be well documented and can be used
 as reference for programming.
 
 In addition, some documentation is hosted in GitHub pages:
-    https://gemarcano.github.io/libctr11/
+    https://gemarcano.github.io/libctr_core/
 
 
 --------------------------------------------------------------------------------
@@ -176,7 +172,7 @@ the following information can be quite useful when debugging bugs:
  - Expected behavior
  - Actual behavior
  - ARM9 entry point
- - How the ARM11 payload was launched and set up
+ - How the ARM payload was launched and set up
  - Any modifications to the library, or extensions
 
 
