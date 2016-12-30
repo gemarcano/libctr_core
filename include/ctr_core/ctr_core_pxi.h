@@ -19,12 +19,27 @@ extern "C" {
 #endif
 
 //PXI registers
-#define PXI_SYNC(base) (*(volatile uint32_t*)(((uintptr_t)(base)) + 0x0))
-#define PXI_CNT(base) (*(volatile uint32_t*)(((uintptr_t)(base)) + 0x4))
-#define PXI_SEND(base) (*(volatile uint32_t*)(((uintptr_t)(base)) + 0x8))
-#define PXI_RECV(base) (*(volatile uint32_t*)(((uintptr_t)(base)) + 0xC))
+#define PXI_SYNC(base) (*(((volatile uint32_t*)(base)) + 0x0))
+#define PXI_CNT(base) (*(((volatile uint32_t*)(base)) + 0x1))
+#define PXI_SEND(base) (*(((volatile uint32_t*)(base)) + 0x2))
+#define PXI_RECV(base) (*(((volatile uint32_t*)(base)) + 0x3))
 
+/**	@brief Sets the PXI base address for register access.
+ *
+ *	This function needs to be called at least once before PXI functions work as
+ *	intended.
+ *
+ *	@param[in] base Base address for register access.
+ *
+ *	@post PXI base address will be used for subsequent PXI operations.
+ */
 void ctr_core_pxi_change_base(volatile uint32_t *base);
+
+/**	@brief Returns the latest/current base address for register access.
+ *
+ *	@return The base address being used for PXI register access.
+ */
+volatile uint32_t* ctr_core_pxi_get_base(void);
 
 /**	@brief Checks if the send PXI queue is empty.
  *

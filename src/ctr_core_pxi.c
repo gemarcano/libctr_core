@@ -4,11 +4,16 @@
 
 #include <ctr_core/ctr_core_pxi.h>
 
-volatile uint32_t *pxi_base = NULL;
+static volatile uint32_t *pxi_base = NULL;
 
 void ctr_core_pxi_change_base(volatile uint32_t *base)
 {
 	pxi_base = base;
+}
+
+volatile uint32_t* ctr_core_pxi_get_base(void)
+{
+	return pxi_base;
 }
 
 bool ctr_core_pxi_send_empty_status(void)
