@@ -8,8 +8,8 @@
 
 /** @file */
 
-#ifndef CTR_SYSTEM_H_
-#define CTR_SYSTEM_H_
+#ifndef CTR_CORE_SYSTEM_H_
+#define CTR_CORE_SYSTEM_H_
 
 #include <stdbool.h>
 
@@ -23,13 +23,13 @@ typedef enum
 {
     SYSTEM_O3DS,
     SYSTEM_N3DS,
-} ctr_system_type;
+} ctr_core_system_type;
 
 /**	@brief Returns whether the arm9 entry was a9lh or not.
  *
  *	@returns True if the arm9 entrypoint was a9lh, false otherwise.
  */
-bool ctr_detect_a9lh_entry(void);
+bool ctr_core_detect_a9lh_entry(void);
 
 /**	@brief Sets up the TWL keyslot.
  *
@@ -43,7 +43,7 @@ bool ctr_detect_a9lh_entry(void);
  *
  *	@post The TWL keyslot is setup properly.
  */
-void ctr_twl_keyslot_setup(void);
+void ctr_core_twl_keyslot_setup(void);
 
 /**	@brief Powers off the 3DS.
  *
@@ -52,7 +52,7 @@ void ctr_twl_keyslot_setup(void);
  *
  *	@post 3DS has powered off.
  */
-void ctr_system_poweroff(void);
+void ctr_core_system_poweroff(void);
 
 /**	@brief Resets the 3DS.
  *
@@ -60,17 +60,17 @@ void ctr_system_poweroff(void);
  *
  *	@post 3DS has restarted.
  */
-void ctr_system_reset(void);
+void ctr_core_system_reset(void);
 
 /**	@brief Returns the enumeration corresponding to the running system.
  *
  *	@returns The type of system this is called in.
  */
-ctr_system_type ctr_get_system_type(void);
+ctr_core_system_type ctr_core_get_system_type(void);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif//CTR_SYSTEM_H_
+#endif//CTR_CORE_SYSTEM_H_
 

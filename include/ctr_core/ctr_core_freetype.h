@@ -8,10 +8,10 @@
 
 /** @file */
 
-#ifndef CTR_FREETYPE_H_
-#define CTR_FREETYPE_H_
+#ifndef CTR_CORE_FREETYPE_H_
+#define CTR_CORE_FREETYPE_H_
 
-#include <ctr11/ctr_screen.h>
+#include <ctr_core/ctr_core_screen.h>
 #include <stdint.h>
 
 #include <ft2build.h>
@@ -24,15 +24,15 @@ extern "C" {
 
 /**	@brief Initializes the freetype subsystem.
  */
-int ctr_freetype_initialize(void);
+int ctr_core_freetype_initialize(void);
 
-FT_Face ctr_freetype_get_face(void);
-FTC_SBit ctr_freetype_prepare_character(char c);
-void ctr_freetype_draw(ctr_screen *screen, size_t x, size_t y, char c, uint32_t pixel, uint32_t bg);
+FT_Face ctr_core_freetype_get_face(void);
+FTC_SBit ctr_core_freetype_prepare_character(char c);
+void ctr_core_freetype_draw(ctr_core_screen *screen, size_t x, size_t y, char c, uint32_t pixel, uint32_t bg);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif//CTR_FREETYPE_H_
+#endif//CTR_CORE_FREETYPE_H_
 

@@ -1,29 +1,27 @@
 include $(top_srcdir)/common.mk
 
-lib_LIBRARIES = libctr11.a
-libctr11_a_CFLAGS=$(AM_CFLAGS) $(C11FLAGS)
-libctr11_a_CCASFLAGS = -I$(top_srcdir)/data
-#payload_stage1_elf_CCASFLAGS = -I$(top_srcdir)/data
-libctr11_a_SOURCES = crt0.s ctr_pxi.c ctr_screen.c i2c.c ctr_system.c $(top_srcdir)/data/ctr_font_data.s ctr_freetype.c ctr_console.c ctr_hid.c ctr_circular_buffer.c ctr_headers.c ctr_firm.c
+lib_LIBRARIES = libctr_core.a
+libctr_core_a_CFLAGS=$(AM_CFLAGS) $(C9FLAGS)
+libctr_core_a_CCASFLAGS = -I$(top_srcdir)/data
+libctr_core_a_SOURCES = ctr_core_pxi.c ctr_core_screen.c ctr_core_i2c.c ctr_core_system.c $(top_srcdir)/data/ctr_core_font_data.s ctr_core_freetype.c ctr_core_console.c ctr_core_hid.c ctr_core_circular_buffer.c ctr_core_headers.c ctr_core_firm.c
 
-
-libctr11dir=$(pkgdatadir)
-libctr11_DATA=linker.ld
+libctr_coredir=$(pkgdatadir)
+libctr_core_DATA=linker.ld
 
 EXTRA_DIST=screen_init.ld
 
 includedirectory = $(top_srcdir)/include
 
-ctrincludedir = $(includedir)/ctr11
+ctrincludedir = $(includedir)/ctr_core
 
-ctrinclude_HEADERS = $(includedirectory)/ctr11/ctr_pxi.h \
-$(includedirectory)/ctr11/ctr_screen.h \
-$(includedirectory)/ctr11/i2c.h \
-$(includedirectory)/ctr11/ctr_system.h \
-$(includedirectory)/ctr11/ctr_freetype.h \
-$(includedirectory)/ctr11/ctr_console.h \
-$(includedirectory)/ctr11/ctr_hid.h \
-$(includedirectory)/ctr11/ctr_circular_buffer.h \
-$(includedirectory)/ctr11/ctr_headers.h \
-$(includedirectory)/ctr11/ctr_firm.h
+ctrinclude_HEADERS = $(includedirectory)/ctr_core/ctr_core_pxi.h \
+$(includedirectory)/ctr_core/ctr_core_screen.h \
+$(includedirectory)/ctr_core/ctr_core_i2c.h \
+$(includedirectory)/ctr_core/ctr_core_system.h \
+$(includedirectory)/ctr_core/ctr_core_freetype.h \
+$(includedirectory)/ctr_core/ctr_core_console.h \
+$(includedirectory)/ctr_core/ctr_core_hid.h \
+$(includedirectory)/ctr_core/ctr_core_circular_buffer.h \
+$(includedirectory)/ctr_core/ctr_core_headers.h \
+$(includedirectory)/ctr_core/ctr_core_firm.h
 

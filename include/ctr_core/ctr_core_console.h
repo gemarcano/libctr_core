@@ -8,13 +8,13 @@
 
 /** @file */
 
-#ifndef CTR_CONSOLE_H_
-#define CTR_CONSOLE_H_
+#ifndef CTR_CORE_CONSOLE_H_
+#define CTR_CORE_CONSOLE_H_
 
 #include <stdint.h>
 #include <stdbool.h>
-#include <ctr11/ctr_screen.h>
-#include <ctr11/ctr_circular_buffer.h>
+#include <ctr_core/ctr_core_screen.h>
+#include <ctr_core/ctr_core_circular_buffer.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -26,7 +26,7 @@ extern "C" {
  *		suceed. If it does not, this means that the underling libc and graphics
  *		handling for libctr9 is broken.
  */
-int ctr_console_initialize(const ctr_screen *screen);
+int ctr_core_console_initialize(const ctr_core_screen *screen);
 
 typedef struct
 {
@@ -49,21 +49,21 @@ typedef struct
 
 	bool negative;
 
-	ctr_screen screen;
+	ctr_core_screen screen;
 
 	size_t buffer_ptr; //Points to the character where the cursor is at
-	ctr_circular_buffer buffer;
+	ctr_core_circular_buffer buffer;
 
-} ctr_console;
+} ctr_core_console;
 
-void ctr_console_draw(char c);
-short ctr_console_get_char_width(char c);
-unsigned int ctr_console_get_char_height(void);
-void ctr_console_clear(void);
+void ctr_core_console_draw(char c);
+short ctr_core_console_get_char_width(char c);
+unsigned int ctr_core_console_get_char_height(void);
+void ctr_core_console_clear(void);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif//CTR_CONSOLE_H_
+#endif//CTR_CORE_CONSOLE_H_
 

@@ -1,10 +1,10 @@
-#include <ctr11/ctr_screen.h>
-#include <ctr11/i2c.h>
+#include <ctr_core/ctr_core_screen.h>
+#include <ctr_core/ctr_core_i2c.h>
 
-ctr_screen ctr_screen_top;
-ctr_screen ctr_screen_bottom;
+ctr_core_screen ctr_screen_top;
+ctr_core_screen ctr_screen_bottom;
 
-void ctr_screen_enable_backlight(ctr_screen_enum aScreens)
+void ctr_core_screen_enable_backlight(ctr_core_screen_enum aScreens)
 {
 	int data = 0;
 	if (aScreens & CTR_SCREEN_TOP)
@@ -17,10 +17,10 @@ void ctr_screen_enable_backlight(ctr_screen_enum aScreens)
 		data |= 1 << 3;
 	}
 
-	i2cWriteRegister(I2C_DEV_MCU, 0x22, data);
+	ctr_core_i2cWriteRegister(I2C_DEV_MCU, 0x22, data);
 }
 
-void ctr_screen_disable_backlight(ctr_screen_enum aScreens)
+void ctr_core_screen_disable_backlight(ctr_core_screen_enum aScreens)
 {
 	int data = 0;
 	if (aScreens & CTR_SCREEN_TOP)
@@ -32,10 +32,10 @@ void ctr_screen_disable_backlight(ctr_screen_enum aScreens)
 	{
 		data |= 1 << 2;
 	}
-	i2cWriteRegister(I2C_DEV_MCU, 0x22, data);
+	ctr_core_i2cWriteRegister(I2C_DEV_MCU, 0x22, data);
 }
 
-void ctr_screen_initialize(ctr_screen *screen, uint8_t *framebuffer, size_t width, size_t height, ctr_screen_pixel format)
+void ctr_core_screen_initialize(ctr_core_screen *screen, uint8_t *framebuffer, size_t width, size_t height, ctr_core_screen_pixel format)
 {
 	screen->framebuffer = framebuffer;
 	screen->width = width;
@@ -63,26 +63,26 @@ void ctr_screen_initialize(ctr_screen *screen, uint8_t *framebuffer, size_t widt
 	}
 }
 
-static inline uint8_t *ctr_screen_get_pixel_ptr(ctr_screen *screen, size_t x, size_t y)
+static inline uint8_t *ctr_core_screen_get_pixel_ptr(ctr_core_screen *screen, size_t x, size_t y)
 {
 	return screen->framebuffer + ((x * screen->height) + ((screen->height - 1 - y))) * screen->pixel_size;
 }
 
-void ctr_screen_clear(ctr_screen *screen, uint32_t pixel)
+void ctr_core_screen_clear(ctr_core_screen *screen, uint32_t pixel)
 {
 	for (size_t x = 0; x < screen->width; ++x)
 	{
 		for (size_t y = screen->height; y > 0; --y)
 		{
-			ctr_screen_set_pixel(screen, x, y, pixel);
+			ctr_core_screen_set_pixel(screen, x, y, pixel);
 		}
 	}
 }
 
-uint32_t ctr_screen_get_pixel(ctr_screen *screen, size_t x, size_t y)
+uint32_t ctr_core_screen_get_pixel(ctr_core_screen *screen, size_t x, size_t y)
 {
 	uint32_t result = 0;
-	uint8_t *pixel = ctr_screen_get_pixel_ptr(screen, x, y);
+	uint8_t *pixel = ctr_core_screen_get_pixel_ptr(screen, x, y);
 	for (size_t i = 0; i < screen->pixel_size; ++i)
 	{
 		result |= (uint32_t)pixel[i] << (i*8u);
@@ -90,16 +90,16 @@ uint32_t ctr_screen_get_pixel(ctr_screen *screen, size_t x, size_t y)
 	return result;
 }
 
-void ctr_screen_set_pixel(ctr_screen *screen, size_t x, size_t y, uint32_t pixel)
+void ctr_core_screen_set_pixel(ctr_core_screen *screen, size_t x, size_t y, uint32_t pixel)
 {
-	uint8_t *p = ctr_screen_get_pixel_ptr(screen, x, y);
+	uint8_t *p = ctr_core_screen_get_pixel_ptr(screen, x, y);
 	for (size_t i = 0; i < screen->pixel_size; ++i)
 	{
 		p[i] = pixel >> (i*8u);
 	}
 }
 
-void ctr_screen_draw_bitmap(ctr_screen *screen, size_t x, size_t y, uint32_t pixel, ctr_screen_bitmap *bitmap)
+void ctr_core_screen_draw_bitmap(ctr_core_screen *screen, size_t x, size_t y, uint32_t pixel, ctr_core_screen_bitmap *bitmap)
 {
 	if (bitmap->width && bitmap->height)
 	{
@@ -115,7 +115,7 @@ void ctr_screen_draw_bitmap(ctr_screen *screen, size_t x, size_t y, uint32_t pix
 			{
 				if (data[byte + width_bytes * j] & (1u << bit))
 				{
-					ctr_screen_set_pixel(screen, x + i, y + j, pixel);
+					ctr_core_screen_set_pixel(screen, x + i, y + j, pixel);
 				}
 			}
 		}

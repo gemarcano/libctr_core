@@ -8,8 +8,8 @@
 
 /** @file */
 
-#ifndef CTR_HEADERS_H_
-#define CTR_HEADERS_H_
+#ifndef CTR_CORE_HEADERS_H_
+#define CTR_CORE_HEADERS_H_
 
 #include <stdint.h>
 #include <stddef.h>
@@ -44,7 +44,7 @@ typedef struct
 	uint8_t anti_piracy_; //This is a guess on the function of this thing, based on 3dbrew
 	uint8_t save_crypto_extra; //This is somewhat documented in Parition Flags for 9.6+
 
-} ctr_ncsd_cart_header;
+} ctr_core_ncsd_cart_header;
 
 /**	@brief Struct representing the NCCH header.
  */
@@ -79,9 +79,9 @@ typedef struct
 	uint8_t reserved4[4];
 	uint8_t exefs_superblock_sha256[0x20]; //starting at 0x0 of the ExeFS over the number of media units specified in the ExeFS hash region size
 	uint8_t romfs_superblock_sha256[0x20]; //starting at 0x0 of the RomFS over the number of media units specified in the RomFS hash region size
-} ctr_ncch_header;
+} ctr_core_ncch_header;
 
-/**	@brief Loads the given ctr_ncsd_cart_header with the data from the actual
+/**	@brief Loads the given ctr_core_ncsd_cart_header with the data from the actual
  *		NCSD cart header in memory.
  *
  *	@param[out] header Struct to load.
@@ -93,9 +93,9 @@ typedef struct
  *	@post If data_size >= 0x200, header is updated to include the parsed data
  *		from the NCSD header in memory, else nothing happens.
  */
-void ctr_ncsd_header_load(ctr_ncsd_cart_header *header, const uint8_t *data, size_t data_size);
+void ctr_core_ncsd_header_load(ctr_core_ncsd_cart_header *header, const uint8_t *data, size_t data_size);
 
-/**	@brief Loads the given ctr_ncch_header with the data from the actual NCCH
+/**	@brief Loads the given ctr_core_ncch_header with the data from the actual NCCH
  *		header in memory.
  *
  *	@param[out] header Struct to load.
@@ -107,11 +107,11 @@ void ctr_ncsd_header_load(ctr_ncsd_cart_header *header, const uint8_t *data, siz
  *	@post If data_size >= 0x200, header is updated to include the parsed data
  *		from the NCSD header in memory, else nothing happens.
  */
-void ctr_ncch_header_load(ctr_ncch_header *header, const uint8_t *data, size_t data_size);
+void ctr_core_ncch_header_load(ctr_core_ncch_header *header, const uint8_t *data, size_t data_size);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif//CTR_HEADERS_H_
+#endif//CTR_CORE_HEADERS_H_
 

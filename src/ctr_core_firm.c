@@ -1,11 +1,11 @@
-#include <ctr11/ctr_firm.h>
+#include <ctr_core/ctr_core_firm.h>
 #include <string.h>
 
 #define LOAD(O,E,A) \
 memcpy(&((O)->E), A, sizeof((O)->E)); \
 A += sizeof((O)->E);
 
-void ctr_firm_section_header_load(ctr_firm_section_header *header, const void *data)
+void ctr_core_firm_section_header_load(ctr_core_firm_section_header *header, const void *data)
 {
 	const uint8_t *d = data;
 	LOAD(header, offset, d);
@@ -15,7 +15,7 @@ void ctr_firm_section_header_load(ctr_firm_section_header *header, const void *d
 	LOAD(header, sha256hash, d);
 }
 
-void ctr_firm_header_load(ctr_firm_header *header, const void *data)
+void ctr_core_firm_header_load(ctr_core_firm_header *header, const void *data)
 {
 	const uint8_t *d = data;
 	LOAD(header, magic, d);
@@ -25,13 +25,13 @@ void ctr_firm_header_load(ctr_firm_header *header, const void *data)
 	LOAD(header, reserved2, d);
 	for (size_t i = 0; i < 4; ++i)
 	{
-		ctr_firm_section_header_load(&(header->section_headers[i]), d);
-		d += sizeof(ctr_firm_section_header);
+		ctr_core_firm_section_header_load(&(header->section_headers[i]), d);
+		d += sizeof(ctr_core_firm_section_header);
 	}
 	LOAD(header, rsa2048signature, d);
 }
 
-void ctr_arm9bin_header_load(ctr_arm9bin_header *header, const void *data)
+void ctr_core_arm9bin_header_load(ctr_core_arm9bin_header *header, const void *data)
 {
 	const uint8_t *d = data;
 	LOAD(header, enc_keyx, d);

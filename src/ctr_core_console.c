@@ -1,4 +1,4 @@
-#include <ctr11/ctr_console.h>
+#include <ctr_core/ctr_core_console.h>
 
 #include <sys/iosupport.h>
 #include <sys/types.h>
@@ -12,9 +12,9 @@
 
 //FIXME Freetype interactions are wonky. I'm not handling the cases where metrics can be negative due to changes in text orientation
 
-#include <ctr11/ctr_freetype.h>
+#include <ctr_core/ctr_core_freetype.h>
 
-static ssize_t ctr_console_write_r(struct _reent *r, int fd, const char *ptr, size_t len);
+static ssize_t ctr_core_console_write_r(struct _reent *r, int fd, const char *ptr, size_t len);
 
 static const devoptab_t tab =
 {
@@ -22,7 +22,7 @@ static const devoptab_t tab =
 	0,
 	NULL,
 	NULL,
-	ctr_console_write_r,
+	ctr_core_console_write_r,
 	NULL,
 	NULL,
 	NULL,
@@ -46,9 +46,9 @@ static const devoptab_t tab =
 	NULL
 };
 
-static ctr_console console;
+static ctr_core_console console;
 
-int ctr_console_initialize(const ctr_screen *screen)
+int ctr_core_console_initialize(const ctr_core_screen *screen)
 {
 	devoptab_list[STD_OUT] = &tab;
 	devoptab_list[STD_ERR] = &tab;
@@ -63,20 +63,20 @@ int ctr_console_initialize(const ctr_screen *screen)
 	console.default_bg = console.bg = 0x000000;
 
 	console.screen = *screen;
-	ctr_circular_buffer_initialize(&console.buffer, 17 * 1024u);
+	ctr_core_circular_buffer_initialize(&console.buffer, 17 * 1024u);
 
 	return 0;
 }
 
-short ctr_console_get_char_width(char c)
+short ctr_core_console_get_char_width(char c)
 {
-	FTC_SBit bit = ctr_freetype_prepare_character(c);
+	FTC_SBit bit = ctr_core_freetype_prepare_character(c);
 	return bit->xadvance;
 }
 
-unsigned int ctr_console_get_char_height(void)
+unsigned int ctr_core_console_get_char_height(void)
 {//FIXME currently char height == line height... will this always be the case?
-	FT_Face face = ctr_freetype_get_face();
+	FT_Face face = ctr_core_freetype_get_face();
 	//This should always be positive...
 	return (unsigned int)(face->size->metrics.height >> 6);
 }
@@ -94,7 +94,7 @@ static void draw_shift_up(void)
 {
 	// Buffer is bottom to top, left to right
 	size_t pixel_size = console.screen.pixel_size;
-	unsigned int line_height = ctr_console_get_char_height();
+	unsigned int line_height = ctr_core_console_get_char_height();
 	size_t copy_col = (console.height - line_height) * pixel_size;
 
 	for (size_t i = 0; i < console.width; ++i)
@@ -105,14 +105,14 @@ static void draw_shift_up(void)
 	}
 }
 
-void ctr_console_draw(char c)
+void ctr_core_console_draw(char c)
 {
 	//This console implementation assumes horizontal layout, always... at least for now
 	//This means the xadvance should always be positive
-	unsigned int cwidth = (unsigned int)ctr_console_get_char_width(c);
-	unsigned int cheight = ctr_console_get_char_height();
+	unsigned int cwidth = (unsigned int)ctr_core_console_get_char_width(c);
+	unsigned int cheight = ctr_core_console_get_char_height();
 
-	FTC_SBit bit = ctr_freetype_prepare_character(c);
+	FTC_SBit bit = ctr_core_freetype_prepare_character(c);
 
 	if (c == '\n' || (console.xpos + cwidth) > console.width)
 	{
@@ -129,22 +129,22 @@ void ctr_console_draw(char c)
 	if (!(c == '\r' || c == '\n'))
 	{
 		//Can I assume bit->top is always positive for horizontal layouts?
-		size_t off = (ctr_console_get_char_height() - (unsigned int)(bit->top));
-		ctr_freetype_draw(&console.screen, console.xpos, console.ypos + off, c, console.fg, console.bg);
+		size_t off = (ctr_core_console_get_char_height() - (unsigned int)(bit->top));
+		ctr_core_freetype_draw(&console.screen, console.xpos, console.ypos + off, c, console.fg, console.bg);
 		console.xpos += cwidth;
 	}
 
-	if (ctr_circular_buffer_count(&console.buffer) == ctr_circular_buffer_size(&console.buffer))
+	if (ctr_core_circular_buffer_count(&console.buffer) == ctr_core_circular_buffer_size(&console.buffer))
 	{
-		ctr_circular_buffer_pop_front(&console.buffer, NULL);
+		ctr_core_circular_buffer_pop_front(&console.buffer, NULL);
 	}
-	ctr_circular_buffer_push_back(&console.buffer, c);
+	ctr_core_circular_buffer_push_back(&console.buffer, c);
 }
 
-void ctr_console_clear(void)
+void ctr_core_console_clear(void)
 {
 	console.xpos = console.ypos = 0;
-	ctr_screen_clear(&console.screen, console.bg);
+	ctr_core_screen_clear(&console.screen, console.bg);
 }
 
 typedef enum
@@ -299,7 +299,7 @@ static void execute_command(const csi_data *data)
 	{
 		case 'A':
 		{
-			uint16_t cheight = (size_t)ctr_console_get_char_height();
+			uint16_t cheight = (size_t)ctr_core_console_get_char_height();
 			size_t param = extract_param(data->params[0], 1);
 
 			size_t pos = console.ypos > (param*cheight) ? console.ypos-(param*cheight) : 0;
@@ -309,7 +309,7 @@ static void execute_command(const csi_data *data)
 		break;
 		case 'B':
 		{
-			uint16_t cheight = ctr_console_get_char_height();
+			uint16_t cheight = ctr_core_console_get_char_height();
 			size_t param = extract_param(data->params[0], 1);
 
 			size_t pos = console.ypos + param * cheight;
@@ -320,7 +320,7 @@ static void execute_command(const csi_data *data)
 		case 'C':
 		{
 			//The problem here is that cwidth may not be constant
-			unsigned int cwidth = (unsigned int)ctr_console_get_char_width('T'); //uh,FIXME, I need to keep track of the text contents...
+			unsigned int cwidth = (unsigned int)ctr_core_console_get_char_width('T'); //uh,FIXME, I need to keep track of the text contents...
 			size_t param = extract_param(data->params[0], 1);
 
 			size_t pos = console.xpos + param*cwidth;
@@ -331,7 +331,7 @@ static void execute_command(const csi_data *data)
 
 		case 'D':
 		{
-			unsigned int cwidth = (unsigned int)ctr_console_get_char_width('T'); //uh,FIXME, I need to keep track of the text contents...
+			unsigned int cwidth = (unsigned int)ctr_core_console_get_char_width('T'); //uh,FIXME, I need to keep track of the text contents...
 			size_t param = extract_param(data->params[0], 1);
 
 			size_t pos = console.xpos > (param*cwidth) ? console.xpos-(param*cwidth) : 0;
@@ -341,7 +341,7 @@ static void execute_command(const csi_data *data)
 
 		case 'E':
 		{
-			uint16_t cheight = ctr_console_get_char_height();
+			uint16_t cheight = ctr_core_console_get_char_height();
 			size_t param = extract_param(data->params[0], 1);
 
 			size_t pos = console.ypos + param*cheight;
@@ -352,7 +352,7 @@ static void execute_command(const csi_data *data)
 
 		case 'F':
 		{
-			uint16_t cheight = ctr_console_get_char_height();
+			uint16_t cheight = ctr_core_console_get_char_height();
 			size_t param = extract_param(data->params[0], 1);
 
 			size_t pos = console.ypos > param*cheight ? console.ypos - param*cheight : 0;
@@ -362,7 +362,7 @@ static void execute_command(const csi_data *data)
 
 		case 'G':
 		{
-			unsigned int cwidth = (unsigned int)ctr_console_get_char_width('T'); //uh,FIXME, I need to keep track of the text contents...
+			unsigned int cwidth = (unsigned int)ctr_core_console_get_char_width('T'); //uh,FIXME, I need to keep track of the text contents...
 			size_t param = extract_param(data->params[0], 1);
 			param -= 1; //Is this indexed 0 or 1 (currently assuming 1)
 
@@ -377,8 +377,8 @@ static void execute_command(const csi_data *data)
 		{
 			size_t param1 = extract_param(data->params[0], 1);
 			size_t param2 = extract_param(data->params[1], 1);
-			unsigned int cwidth = (unsigned int)ctr_console_get_char_width('T'); //uh,FIXME, I need to keep track of the text contents...
-			uint16_t cheight = ctr_console_get_char_height();
+			unsigned int cwidth = (unsigned int)ctr_core_console_get_char_width('T'); //uh,FIXME, I need to keep track of the text contents...
+			uint16_t cheight = ctr_core_console_get_char_height();
 
 			size_t posx = param1*cwidth < console.width ? param1*cwidth : console.width;
 			size_t posy = param2*cheight < console.height ? param2*cheight : console.height;
@@ -400,7 +400,7 @@ static void execute_command(const csi_data *data)
 			}
 			else if (param == 2)
 			{
-				ctr_console_clear();
+				ctr_core_console_clear();
 			}
 		}
 		break;
@@ -456,7 +456,7 @@ static size_t process_csi(const char *str, size_t len)
 	return i;
 }
 
-static ssize_t ctr_console_write_r(struct _reent *r, int fd, const char *ptr, size_t len)
+static ssize_t ctr_core_console_write_r(struct _reent *r, int fd, const char *ptr, size_t len)
 {
 	for (size_t i = 0; i < len; ++i)
 	{
@@ -471,7 +471,7 @@ static ssize_t ctr_console_write_r(struct _reent *r, int fd, const char *ptr, si
 		}
 		else
 		{
-			ctr_console_draw(ptr[i]);
+			ctr_core_console_draw(ptr[i]);
 		}
 	}
 	return (ssize_t)len;

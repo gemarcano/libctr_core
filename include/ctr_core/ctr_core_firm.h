@@ -8,8 +8,8 @@
 
 /** @file */
 
-#ifndef CTR_FIRM_H_
-#define CTR_FIRM_H_
+#ifndef CTR_CORE_FIRM_H_
+#define CTR_CORE_FIRM_H_
 
 #include <stdint.h>
 
@@ -27,7 +27,7 @@ typedef struct
 	uint32_t size;
 	uint32_t type;
 	uint8_t sha256hash[0x20];
-} ctr_firm_section_header;
+} ctr_core_firm_section_header;
 
 /**	@brief Represents the information found in the firm header.
  */
@@ -38,9 +38,9 @@ typedef struct
 	uint32_t arm11_entry;
 	uint32_t arm9_entry;
 	uint8_t reserved2[0x30];
-	ctr_firm_section_header section_headers[4];
+	ctr_core_firm_section_header section_headers[4];
 	uint8_t rsa2048signature[0x100]; //signature of header's hash
-} ctr_firm_header;
+} ctr_core_firm_header;
 
 /**	@brief Represents the information found in the arm9bin header.
  */
@@ -54,7 +54,7 @@ typedef struct
 	uint8_t control_block[16];
 	uint8_t hardware_debug[16]; //9.5+
 	uint8_t enc_key16x[16]; //9.5+
-} ctr_arm9bin_header;
+} ctr_core_arm9bin_header;
 
 /**	@brief Loads the given firm section header structure with the values found
  *		in memory.
@@ -66,7 +66,7 @@ typedef struct
  *	@post The given firm section header struct has been filled out based on the
  *		data found in memory.
  */
-void ctr_firm_section_header_load(ctr_firm_section_header *header, const void *data);
+void ctr_core_firm_section_header_load(ctr_core_firm_section_header *header, const void *data);
 
 /**	@brief Loads the given firm header structure with the values found in
  *		memory.
@@ -78,7 +78,7 @@ void ctr_firm_section_header_load(ctr_firm_section_header *header, const void *d
  *	@post The given firm header struct has been filled out based on the data
  *		found in memory.
  */
-void ctr_firm_header_load(ctr_firm_header *header, const void *data);
+void ctr_core_firm_header_load(ctr_core_firm_header *header, const void *data);
 
 /**	@brief Loads the given arm9bin header structure with the values found in
  *		memory.
@@ -90,11 +90,11 @@ void ctr_firm_header_load(ctr_firm_header *header, const void *data);
  *	@post The given firm header struct has been filled out based on the data
  *		found in memory.
  */
-void ctr_arm9bin_header_load(ctr_arm9bin_header *header, const void *data);
+void ctr_core_arm9bin_header_load(ctr_core_arm9bin_header *header, const void *data);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif//TR_FIRM_H_
+#endif//CTR_CORE_FIRM_H_
 

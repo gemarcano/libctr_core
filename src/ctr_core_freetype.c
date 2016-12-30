@@ -1,5 +1,5 @@
-#include <ctr11/ctr_freetype.h>
-#include <ctr11/ctr_screen.h>
+#include <ctr_core/ctr_core_freetype.h>
+#include <ctr_core/ctr_core_screen.h>
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
@@ -19,23 +19,23 @@ typedef struct
 	const char* filepath;
 	int index;
 	FT_Face face;
-} ctr_face;
+} ctr_core_face;
 
-static ctr_face faceid;
+static ctr_core_face faceid;
 
-extern unsigned char *ctr_font_data_begin;
-extern long int ctr_font_data_size;
+extern unsigned char *ctr_core_font_data_begin;
+extern long int ctr_core_font_data_size;
 
 static FT_Error face_requester(FTC_FaceID face_id, FT_Library lib, FT_Pointer data, FT_Face *aface)
 {
-	ctr_face *face = (ctr_face*)face_id;
+	ctr_core_face *face = (ctr_core_face*)face_id;
 	if (face->filepath)
 		return FT_New_Face(library, face->filepath, face->index, aface);
 	else
-		return FT_New_Memory_Face(library, ctr_font_data_begin, ctr_font_data_size, face->index, aface);
+		return FT_New_Memory_Face(library, ctr_core_font_data_begin, ctr_core_font_data_size, face->index, aface);
 }
 
-int ctr_freetype_initialize(void)
+int ctr_core_freetype_initialize(void)
 {
 	int err = FT_Init_FreeType(&library);
 	if (err) return err;
@@ -51,7 +51,7 @@ int ctr_freetype_initialize(void)
 
 	err = FTC_Manager_LookupFace(manager, (FTC_FaceID)&faceid, &faceid.face);
 
-	FT_Face face = ctr_freetype_get_face();
+	FT_Face face = ctr_core_freetype_get_face();
 	if (!face->num_fixed_sizes)
 	{
 		scaler.face_id = (FTC_FaceID)&faceid;
@@ -78,7 +78,7 @@ int ctr_freetype_initialize(void)
 	return err;
 }
 
-FTC_SBit ctr_freetype_prepare_character(char c)
+FTC_SBit ctr_core_freetype_prepare_character(char c)
 {
 	size_t glyphIndex = FTC_CMapCache_Lookup(ccache, (FTC_FaceID)&faceid, 0, c);
 
@@ -87,9 +87,9 @@ FTC_SBit ctr_freetype_prepare_character(char c)
 	return bit;
 }
 
-void ctr_freetype_draw(ctr_screen *screen, size_t x, size_t y, char c, uint32_t pixel, uint32_t bg)
+void ctr_core_freetype_draw(ctr_core_screen *screen, size_t x, size_t y, char c, uint32_t pixel, uint32_t bg)
 {
-	FTC_SBit bit = ctr_freetype_prepare_character(c);
+	FTC_SBit bit = ctr_core_freetype_prepare_character(c);
 	for (size_t yy = 0; yy < bit->height; ++yy)
 	{
 		//FIXME assuming positive pitch...
@@ -101,11 +101,11 @@ void ctr_freetype_draw(ctr_screen *screen, size_t x, size_t y, char c, uint32_t 
 				uint8_t *buf = bit->buffer;
 				if (buf[(size_t)bit->pitch * yy + bytes] & (0x80u >> i))
 				{
-					ctr_screen_set_pixel(screen, x+bytes*8+i, y+yy, pixel);
+					ctr_core_screen_set_pixel(screen, x+bytes*8+i, y+yy, pixel);
 				}
 				else
 				{
-					ctr_screen_set_pixel(screen, x+bytes*8+i, y+yy, bg);
+					ctr_core_screen_set_pixel(screen, x+bytes*8+i, y+yy, bg);
 				}
 			}
 		}
@@ -113,7 +113,7 @@ void ctr_freetype_draw(ctr_screen *screen, size_t x, size_t y, char c, uint32_t 
 }
 
 
-FT_Face ctr_freetype_get_face(void)
+FT_Face ctr_core_freetype_get_face(void)
 {
 	FT_Face face;
 	int err = FTC_Manager_LookupFace(manager, (FTC_FaceID)&faceid, &face);

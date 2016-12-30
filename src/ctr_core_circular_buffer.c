@@ -2,9 +2,9 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-#include <ctr11/ctr_circular_buffer.h>
+#include <ctr_core/ctr_core_circular_buffer.h>
 
-void ctr_circular_buffer_initialize(ctr_circular_buffer *buffer, size_t size)
+void ctr_core_circular_buffer_initialize(ctr_core_circular_buffer *buffer, size_t size)
 {
 	buffer->size = size;
 	buffer->buffer = malloc(size);
@@ -14,7 +14,7 @@ void ctr_circular_buffer_initialize(ctr_circular_buffer *buffer, size_t size)
 }
 
 
-bool ctr_circular_buffer_push_back(ctr_circular_buffer *buffer, char data)
+bool ctr_core_circular_buffer_push_back(ctr_core_circular_buffer *buffer, char data)
 {
 	if (buffer->count != buffer->size)
 	{
@@ -35,7 +35,7 @@ bool ctr_circular_buffer_push_back(ctr_circular_buffer *buffer, char data)
 	return true;
 }
 
-bool ctr_circular_buffer_pop_front(ctr_circular_buffer *buffer, char *data)
+bool ctr_core_circular_buffer_pop_front(ctr_core_circular_buffer *buffer, char *data)
 {
 	if (buffer->count != 0)
 	{
@@ -57,7 +57,7 @@ bool ctr_circular_buffer_pop_front(ctr_circular_buffer *buffer, char *data)
 	return true;
 }
 
-bool ctr_circular_buffer_get(ctr_circular_buffer *buffer, size_t index, char *data)
+bool ctr_core_circular_buffer_get(ctr_core_circular_buffer *buffer, size_t index, char *data)
 {
 	if (index > buffer->count) return false;
 
@@ -70,12 +70,12 @@ bool ctr_circular_buffer_get(ctr_circular_buffer *buffer, size_t index, char *da
 	return true;
 }
 
-size_t ctr_circular_buffer_size(ctr_circular_buffer *buffer)
+size_t ctr_core_circular_buffer_size(ctr_core_circular_buffer *buffer)
 {
 	return buffer->size;
 }
 
-size_t ctr_circular_buffer_count(ctr_circular_buffer *buffer)
+size_t ctr_core_circular_buffer_count(ctr_core_circular_buffer *buffer)
 {
 	return buffer->count;
 }

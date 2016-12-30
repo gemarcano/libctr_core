@@ -8,8 +8,8 @@
 
 /** @file */
 
-#ifndef CTR_SCREEN_H_
-#define CTR_SCREEN_H_
+#ifndef CTR_CORE_SCREEN_H_
+#define CTR_CORE_SCREEN_H_
 
 #include <stddef.h>
 #include <stdint.h>
@@ -26,7 +26,7 @@ typedef enum
 	CTR_SCREEN_TOP = 1,
 	CTR_SCREEN_BOTTOM = 2,
 	CTR_SCREEN_BOTH = 3
-} ctr_screen_enum;
+} ctr_core_screen_enum;
 
 /**	@brief Enables the backlight for the screens specified.
  *
@@ -34,7 +34,7 @@ typedef enum
  *
  *	@post Backlight for the specified screens will be enabled.
  */
-void ctr_screen_enable_backlight(ctr_screen_enum aScreens);
+void ctr_core_screen_enable_backlight(ctr_core_screen_enum aScreens);
 
 /**	@brief Disables the backlight for the screens specified.
  *
@@ -42,7 +42,7 @@ void ctr_screen_enable_backlight(ctr_screen_enum aScreens);
  *
  *	@post Backlight for the specified screens will be disabled.
  */
-void ctr_screen_disable_backlight(ctr_screen_enum aScreens);
+void ctr_core_screen_disable_backlight(ctr_core_screen_enum aScreens);
 
 /**	@brief Represents the different framebuffer formats supported by the 3DS
  *		GPU.
@@ -54,7 +54,7 @@ typedef enum
 	CTR_GFX_PIXEL_RGB565,
 	CTR_GFX_PIXEL_A1_RGB5,
 	CTR_GFX_PIXEL_RGBA4
-} ctr_screen_pixel;
+} ctr_core_screen_pixel;
 
 /**	@brief Represents a single 3DS screen.
  */
@@ -64,8 +64,8 @@ typedef struct
 	size_t width;
 	size_t height;
 	size_t pixel_size;
-	ctr_screen_pixel format;
-} ctr_screen;
+	ctr_core_screen_pixel format;
+} ctr_core_screen;
 
 //FIXME currently bitmaps must start at the beginning of a byte
 /**	@brief Represents a single bitmap entity.
@@ -74,9 +74,9 @@ typedef struct
 {
 	size_t width, height;
 	void *data;
-} ctr_screen_bitmap;
+} ctr_core_screen_bitmap;
 
-extern ctr_screen ctr_screen_top, ctr_screen_bottom;
+extern ctr_core_screen ctr_screen_top, ctr_screen_bottom;
 
 /**	@brief Initializes the given screen.
  *
@@ -88,7 +88,7 @@ extern ctr_screen ctr_screen_top, ctr_screen_bottom;
  *
  *	@post The screen object has been initialized and is ready for use.
  */
-void ctr_screen_initialize(ctr_screen *screen, uint8_t *framebuffer, size_t width, size_t height, ctr_screen_pixel format);
+void ctr_core_screen_initialize(ctr_core_screen *screen, uint8_t *framebuffer, size_t width, size_t height, ctr_core_screen_pixel format);
 
 //FIXME these functions are bound to change. I can't say I'm happy about the API
 
@@ -107,7 +107,7 @@ void ctr_screen_initialize(ctr_screen *screen, uint8_t *framebuffer, size_t widt
  *	@returns The pixel value at the specified location. The current screen
  *	format governs how many of the returned bits mean anything.
  */
-uint32_t ctr_screen_get_pixel(ctr_screen *screen, size_t x, size_t y);
+uint32_t ctr_core_screen_get_pixel(ctr_core_screen *screen, size_t x, size_t y);
 
 /**	@brief Sets the pixel to the value specified in the given screen.
  *
@@ -123,7 +123,7 @@ uint32_t ctr_screen_get_pixel(ctr_screen *screen, size_t x, size_t y);
  *
  *	@post The pixel value specified has been set at the given position.
  */
-void ctr_screen_set_pixel(ctr_screen *screen, size_t x, size_t y, uint32_t pixel);
+void ctr_core_screen_set_pixel(ctr_core_screen *screen, size_t x, size_t y, uint32_t pixel);
 
 /**	@brief Draws the given bitmap at the given location in the given screen.
  *
@@ -140,7 +140,7 @@ void ctr_screen_set_pixel(ctr_screen *screen, size_t x, size_t y, uint32_t pixel
  *
  *	@post The bitmap has been drawn at the given location.
  */
-void ctr_screen_draw_bitmap(ctr_screen *screen, size_t x, size_t y, uint32_t pixel, ctr_screen_bitmap *bitmap);
+void ctr_core_screen_draw_bitmap(ctr_core_screen *screen, size_t x, size_t y, uint32_t pixel, ctr_core_screen_bitmap *bitmap);
 
 /**	@brief Clears the screen with the given pixel.
  *
@@ -149,16 +149,11 @@ void ctr_screen_draw_bitmap(ctr_screen *screen, size_t x, size_t y, uint32_t pix
  *
  *	@post Screen is cleared with the given pixel.
  */
-void ctr_screen_clear(ctr_screen *screen, uint32_t pixel);
-
+void ctr_core_screen_clear(ctr_core_screen *screen, uint32_t pixel);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif//CTR_SCREEN_H_
-
-#ifdef __cplusplus
-extern "C" {
-#endif
+#endif//CTR_CORE_SCREEN_H_
 

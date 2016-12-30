@@ -8,8 +8,8 @@
 
 /** @file */
 
-#include <ctr11/ctr_system.h>
-#include <ctr11/i2c.h>
+#include <ctr_core/ctr_core_system.h>
+#include <ctr_core/ctr_core_i2c.h>
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -17,7 +17,7 @@
 #define PDN_MPCORE_CFG ((volatile uint8_t*)0x10140FFC)
 #define PDN_SPI_CNT ((volatile uint8_t*)0x101401C0)
 
-ctr_system_type ctr_get_system_type(void)
+ctr_core_system_type ctr_core_get_system_type(void)
 {
 	//This is seemingly not confirmed on 3dbrew, but it seems PDN_MPCORE_CFG's
 	//second and third bit are only set on the N3DS, while the first bit is
@@ -25,21 +25,21 @@ ctr_system_type ctr_get_system_type(void)
 	return 0x07 == *PDN_MPCORE_CFG ? SYSTEM_N3DS : SYSTEM_O3DS;
 }
 
-bool ctr_detect_a9lh_entry(void)
+bool ctr_core_detect_a9lh_entry(void)
 {
 	//Aurora determined that this register isn't yet set when a9lh launches.
 	return *PDN_SPI_CNT == 0;
 }
 
-void ctr_system_poweroff(void)
+void ctr_core_system_poweroff(void)
 {
-	i2cWriteRegister(I2C_DEV_MCU, 0x20, 1);
+	ctr_core_i2cWriteRegister(I2C_DEV_MCU, 0x20, 1);
 	while (true);
 }
 
-void ctr_system_reset(void)
+void ctr_core_system_reset(void)
 {
-	i2cWriteRegister(I2C_DEV_MCU, 0x20, 1 << 2);
+	ctr_core_i2cWriteRegister(I2C_DEV_MCU, 0x20, 1 << 2);
 	while (true);
 }
 
