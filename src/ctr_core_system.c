@@ -13,6 +13,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <stdnoreturn.h>
 
 #define PDN_MPCORE_CFG ((volatile uint8_t*)0x10140FFC)
 #define PDN_SPI_CNT ((volatile uint8_t*)0x101401C0)
@@ -31,13 +32,13 @@ bool ctr_core_detect_a9lh_entry(void)
 	return *PDN_SPI_CNT == 0;
 }
 
-void ctr_core_system_poweroff(void)
+noreturn void ctr_core_system_poweroff(void)
 {
 	ctr_core_i2cWriteRegister(I2C_DEV_MCU, 0x20, 1);
 	while (true);
 }
 
-void ctr_core_system_reset(void)
+noreturn void ctr_core_system_reset(void)
 {
 	ctr_core_i2cWriteRegister(I2C_DEV_MCU, 0x20, 1 << 2);
 	while (true);

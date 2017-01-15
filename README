@@ -43,15 +43,29 @@ Dependencies
 
  - Autotools in general. These are used to create the build scripts.
 
+ - autoconf-archive. Some of the macros provided by this packages are used by
+    the bundled autoconf scripts.
+
 
 --------------------------------------------------------------------------------
 Compiling (TODO)
 --------------------------------------------------------------------------------
 
-Must be compiled separately for libctr9 and libctr11
+Due to the differences between the devKitARM bundled libc between ARM9 and
+ARM11, mostly having to do with hardware floating point support, libctr_core
+must be compiled separately for libctr9 and libctr11.
 
-Currently, change C[9,11]FLAGS in src/Makefile.am to the correct one before
-calling configure
+The configure script supports the --with-gcc-arch option, which allows one to
+specify an architecture or even CPU model to target. For reference, the ARM9
+CPU in the 3DS is compatible with CPU model arm946e-s, and the ARM11 with
+mpcore.
+
+For convenience, the configure script has two --enable-* options that set up
+some common compilation flags. --enable-thumb tells the project to compile the
+library in Thumb mode, and --enable-3ds-arm11 enables some flags that make the
+binary compatible with devKitARM's libc. Note that both cannot be enabled at the
+same time (that is, it is not possible to compile an ARM11 application in thumb
+mode that has hardware floating point support).
 
 As a suggestion, it is recommended for one to set up a fixed prefix directory
 and to store a share/config.site under the prefix. For example, if the variable
@@ -60,8 +74,8 @@ file would be located. Any variables defined here will be picked up by configure
 upon being run. At a minimum, if other libraries will be installed to the prefix
 path, the config.site should have the following:
 
-CPPFLAGS="$CPPFLAGS -I$prefix/include -I$prefix/include/freetype2"
-LDFLAGS="-L$prefix/lib $LDFLAGS"
+  CPPFLAGS="$CPPFLAGS -I$prefix/include -I$prefix/include/freetype2"
+  LDFLAGS="-L$prefix/lib $LDFLAGS"
 
 This example assumes that these directories exist, and in particular that
 FreeType2's include path exists in the folder shown above. Refer to:
@@ -73,22 +87,34 @@ The Autotools setup assumes that devkitarm is already in the PATH.
  # this following line is if the 3ds compiler isn't in the path
  export PATH=${PATH}:${DEVKITPRO}/bin:${DEVKITARM}/bin
  autoreconf -if
- ./configure --host arm-none-eabi --prefix=[lib install path]
+ ./configure --host arm-none-eabi --with-gcc-arch=[architecture] \
+   --prefix=[lib install path] --enable-[optional]
  make
 
 Example for ARM11:
   #first, go edit src/Makefile.am to use C11FLAGS instead of C9FLAGS
   export PATH=${PATH}:${DEVKITPRO}/bin:${DEVKITARM}/bin
   autoreconf -if
-  ./configure --host arm-none-eabi --prefix="$HOME/.local/usr/arm-none-eabi-11/"
+  ./configure --host arm-none-eabi --with-gcc-arch=mpcore \
+    --prefix="$HOME/.local/usr/arm-none-eabi-11/" --enable-3ds-arm11
   make -j10
 
 Example for ARM9:
   #first, go edit src/Makefile.am to use C9FLAGS instead of C11FLAGS
   export PATH=${PATH}:${DEVKITPRO}/bin:${DEVKITARM}/bin
   autoreconf -if
-  ./configure --host arm-none-eabi --prefix="$HOME/.local/usr/arm-none-eabi-9/"
+  ./configure --host arm-none-eabi --with-gcc-arch=arm946e-s \
+    --prefix="$HOME/.local/usr/arm-none-eabi-9/" --enable-thumb
   make -j10
+
+As a heads up, if one does not set up a config.site in $prefix/share with the
+freetype paths as shown above, one will need to add a -I gcc include directory
+option to either CFLAGS or CPPFLAGS when invoking ./configure, so that it can
+properly find the freetype header it is looking for. For example:
+
+  ./configure --host arm-none-eabi --with-gcc-arch=arm946e-s \
+    --prefix="$HOME/.local/usr/arm-none-eabi-9/" --enable-thumb \
+	CPPFLAGS="-I"$HOME/.local/usr/arm-none-eabi-9/include/freetype2"
 
 
 --------------------------------------------------------------------------------
@@ -111,18 +137,18 @@ Usage
 --------------------------------------------------------------------------------
 
 Depending on where the library is installed, one may need to use -L in one's
-projects to point the compiler to find the library, then use -lctr11 to cause
+projects to point the compiler to find the library, then use -lctr_core to cause
 the linker to link in the static library.
 
 Example:
   arm-none-eabi-gcc -I$HOME/.local/usr/arm-none-eabi-11/include \
     -L$HOME/.local/usr/arm-none-eabi-11/lib -Os -Wall -Wextra -Wpedantic \
-	hello.c -lctr11 -lfreetype2 -lctrelf
+	hello.c -lctr11 -lctr_core -lfreetype2
 
-One setup that is recommended is to export a variable such as, CTRARM11, to
-point to the root of the prefix where libctr11 is installed. This way, it is
-easier to point to the lib and include directories (such as by using
-$CTRARM11/include and $CTRARM11/lib).
+One setup that is recommended is to export a variable such as, CTRARM11 or
+CTRARM9, to point to the root of the prefix where libctr_core is installed. This
+way, it is easier to point to the lib and include directories (such as by using
+$CTRARM11/include and $CTRARM9/lib, as examples).
 
 This library may be useful for others, but it is meant to be a place where
 shared code used by libctr9 and libctr11 can be placed and maintained. The
