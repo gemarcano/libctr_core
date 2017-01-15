@@ -13,6 +13,8 @@
 //FIXME Freetype interactions are wonky. I'm not handling the cases where metrics can be negative due to changes in text orientation
 
 #include <ctr_core/ctr_core_freetype.h>
+#include <ctr_core/ctr_core_screen.h>
+#include <ctr_core/ctr_core_surface.h>
 
 static ssize_t ctr_core_console_write_r(struct _reent *r, void *fd, const char *ptr, size_t len);
 
@@ -48,7 +50,7 @@ static const devoptab_t tab =
 
 static ctr_core_console console;
 
-int ctr_core_console_initialize(const ctr_core_screen *screen)
+int ctr_core_console_initialize(ctr_core_surface *surface)
 {
 	devoptab_list[STD_OUT] = &tab;
 	devoptab_list[STD_ERR] = &tab;
@@ -57,12 +59,12 @@ int ctr_core_console_initialize(const ctr_core_screen *screen)
 
 	memset(&console, 0, sizeof(console));
 	console.font_pt = 14;
-	console.width = screen->width;
-	console.height = screen->height;
+	console.width = ctr_core_surface_get_width(surface);
+	console.height = ctr_core_surface_get_height(surface);
 	console.default_fg = console.fg = 0xFFFFFF;
 	console.default_bg = console.bg = 0x000000;
 
-	console.screen = *screen;
+	console.surface = surface;
 	ctr_core_circular_buffer_initialize(&console.buffer, 17 * 1024u);
 
 	return 0;
@@ -93,17 +95,37 @@ static void pixel_set(void *buffer, uint32_t pixel, size_t pixel_size, size_t co
 static void draw_shift_up(void)
 {
 	// Buffer is bottom to top, left to right
-	size_t pixel_size = console.screen.pixel_size;
+	ctr_core_screen *screen = ctr_core_surface_get_screen(console.surface);
+	size_t pixel_size = screen->pixel_size;
+	unsigned int line_height = ctr_core_console_get_char_height();
+	size_t copy_col = (console.height - line_height) * pixel_size;
+
+	for (size_t x = 0; x < console.width; ++x)
+	{
+		for (size_t y = line_height; y < console.height; ++y)
+		{
+			uint32_t pixel = ctr_core_surface_get_pixel(console.surface, x, y);
+			ctr_core_surface_set_pixel(console.surface, x, y, console.bg);
+			ctr_core_surface_set_pixel(console.surface, x, y - line_height, pixel);
+		}
+	}
+}
+
+/*static void draw_shift_up(void)
+{
+	// Buffer is bottom to top, left to right
+	ctr_core_screen *screen = ctr_core_surface_get_screen(console.surface);
+	size_t pixel_size = screen->pixel_size;
 	unsigned int line_height = ctr_core_console_get_char_height();
 	size_t copy_col = (console.height - line_height) * pixel_size;
 
 	for (size_t i = 0; i < console.width; ++i)
 	{
-		uint8_t *col = console.screen.framebuffer + i*console.screen.height*pixel_size;
+		uint8_t *col = screen->framebuffer + i*console.height*pixel_size;
 		memmove(col + line_height*pixel_size, col, copy_col);
 		pixel_set(col, console.bg, pixel_size, line_height);
 	}
-}
+}*/
 
 void ctr_core_console_draw(char c)
 {
@@ -130,7 +152,7 @@ void ctr_core_console_draw(char c)
 	{
 		//Can I assume bit->top is always positive for horizontal layouts?
 		size_t off = (ctr_core_console_get_char_height() - (unsigned int)(bit->top));
-		ctr_core_freetype_draw(&console.screen, console.xpos, console.ypos + off, c, console.fg, console.bg);
+		ctr_core_freetype_draw(console.surface, console.xpos, console.ypos + off, c, console.fg, console.bg);
 		console.xpos += cwidth;
 	}
 
@@ -144,7 +166,7 @@ void ctr_core_console_draw(char c)
 void ctr_core_console_clear(void)
 {
 	console.xpos = console.ypos = 0;
-	ctr_core_screen_clear(&console.screen, console.bg);
+	ctr_core_surface_clear(console.surface, console.bg);
 }
 
 typedef enum

@@ -1,5 +1,5 @@
 #include <ctr_core/ctr_core_freetype.h>
-#include <ctr_core/ctr_core_screen.h>
+#include <ctr_core/ctr_core_surface.h>
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
@@ -87,7 +87,7 @@ FTC_SBit ctr_core_freetype_prepare_character(char c)
 	return bit;
 }
 
-void ctr_core_freetype_draw(ctr_core_screen *screen, size_t x, size_t y, char c, uint32_t pixel, uint32_t bg)
+void ctr_core_freetype_draw(void *surface, size_t x, size_t y, char c, uint32_t pixel, uint32_t bg)
 {
 	FTC_SBit bit = ctr_core_freetype_prepare_character(c);
 	for (size_t yy = 0; yy < bit->height; ++yy)
@@ -101,11 +101,11 @@ void ctr_core_freetype_draw(ctr_core_screen *screen, size_t x, size_t y, char c,
 				uint8_t *buf = bit->buffer;
 				if (buf[(size_t)bit->pitch * yy + bytes] & (0x80u >> i))
 				{
-					ctr_core_screen_set_pixel(screen, x+bytes*8+i, y+yy, pixel);
+					ctr_core_surface_set_pixel(surface, x+bytes*8+i, y+yy, pixel);
 				}
 				else
 				{
-					ctr_core_screen_set_pixel(screen, x+bytes*8+i, y+yy, bg);
+					ctr_core_surface_set_pixel(surface, x+bytes*8+i, y+yy, bg);
 				}
 			}
 		}

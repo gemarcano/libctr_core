@@ -13,7 +13,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-#include <ctr_core/ctr_core_screen.h>
+#include <ctr_core/ctr_core_surface.h>
 #include <ctr_core/ctr_core_circular_buffer.h>
 
 #ifdef __cplusplus
@@ -26,7 +26,7 @@ extern "C" {
  *		suceed. If it does not, this means that the underling libc and graphics
  *		handling for libctr9 is broken.
  */
-int ctr_core_console_initialize(const ctr_core_screen *screen);
+int ctr_core_console_initialize(ctr_core_surface *surface);
 
 typedef struct
 {
@@ -49,7 +49,7 @@ typedef struct
 
 	bool negative;
 
-	ctr_core_screen screen;
+	ctr_core_surface *surface;
 
 	size_t buffer_ptr; //Points to the character where the cursor is at
 	ctr_core_circular_buffer buffer;

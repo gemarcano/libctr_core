@@ -11,6 +11,7 @@
 #ifndef CTR_CORE_SCREEN_H_
 #define CTR_CORE_SCREEN_H_
 
+#include <ctr_core/ctr_core_surface.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -58,8 +59,9 @@ typedef enum
 
 /**	@brief Represents a single 3DS screen.
  */
-typedef struct
+typedef struct ctr_core_screen
 {
+	ctr_core_surface base;
 	uint8_t *framebuffer;
 	size_t width;
 	size_t height;
@@ -92,6 +94,22 @@ void ctr_core_screen_initialize(ctr_core_screen *screen, uint8_t *framebuffer, s
 
 //FIXME these functions are bound to change. I can't say I'm happy about the API
 
+/**	@brief Returns the screen's width.
+ *
+ *	@param[in] screen Screen to poll for its width.
+ *
+ *	@return The width of the given screen.
+ */
+size_t ctr_core_screen_get_width(const void *screen);
+
+/**	@brief Returns the screen's height.
+ *
+ *	@param[in] screen Screen to poll for its height.
+ *
+ *	@return The height of the given screen.
+ */
+size_t ctr_core_screen_get_height(const void *screen);
+
 /**	@brief Retrieves the pixel specified from the given screen.
  *
  *	Note that only the actual size of the pixel, according to the current pixel,
@@ -107,7 +125,7 @@ void ctr_core_screen_initialize(ctr_core_screen *screen, uint8_t *framebuffer, s
  *	@returns The pixel value at the specified location. The current screen
  *	format governs how many of the returned bits mean anything.
  */
-uint32_t ctr_core_screen_get_pixel(ctr_core_screen *screen, size_t x, size_t y);
+uint32_t ctr_core_screen_get_pixel(const void *screen, size_t x, size_t y);
 
 /**	@brief Sets the pixel to the value specified in the given screen.
  *
@@ -123,7 +141,15 @@ uint32_t ctr_core_screen_get_pixel(ctr_core_screen *screen, size_t x, size_t y);
  *
  *	@post The pixel value specified has been set at the given position.
  */
-void ctr_core_screen_set_pixel(ctr_core_screen *screen, size_t x, size_t y, uint32_t pixel);
+void ctr_core_screen_set_pixel(void *screen, size_t x, size_t y, uint32_t pixel);
+
+/**	@brief Returns the screen.
+ *
+ *	@param[in] screen Effectively, the return value.
+ *
+ *	@returns The screen.
+ */
+ctr_core_screen *ctr_core_screen_get_screen(void *screen);
 
 /**	@brief Draws the given bitmap at the given location in the given screen.
  *
@@ -149,7 +175,7 @@ void ctr_core_screen_draw_bitmap(ctr_core_screen *screen, size_t x, size_t y, ui
  *
  *	@post Screen is cleared with the given pixel.
  */
-void ctr_core_screen_clear(ctr_core_screen *screen, uint32_t pixel);
+void ctr_core_screen_clear(void *screen, uint32_t pixel);
 
 #ifdef __cplusplus
 }

@@ -11,7 +11,6 @@
 #ifndef CTR_CORE_FREETYPE_H_
 #define CTR_CORE_FREETYPE_H_
 
-#include <ctr_core/ctr_core_screen.h>
 #include <stdint.h>
 
 #include <ft2build.h>
@@ -28,7 +27,7 @@ int ctr_core_freetype_initialize(void);
 
 FT_Face ctr_core_freetype_get_face(void);
 FTC_SBit ctr_core_freetype_prepare_character(char c);
-void ctr_core_freetype_draw(ctr_core_screen *screen, size_t x, size_t y, char c, uint32_t pixel, uint32_t bg);
+void ctr_core_freetype_draw(void *surface, size_t x, size_t y, char c, uint32_t pixel, uint32_t bg);
 
 #ifdef __cplusplus
 }
