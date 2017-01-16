@@ -13,8 +13,15 @@
 
 #include <stdbool.h>
 
+#ifdef CTR_NORETURN
+#undef CTR_NORETURN
+#endif
+
 #ifdef __cplusplus
 extern "C" {
+#define CTR_NORETURN [[noreturn]]
+#else
+#define CTR_NORETURN _Noreturn
 #endif
 
 /** @brief Enumeration describing the running system.
@@ -31,20 +38,6 @@ typedef enum
  */
 bool ctr_core_detect_a9lh_entry(void);
 
-/**	@brief Sets up the TWL keyslot.
- *
- *	This only really matters if arm9 execution is obtained via a9lh, or prior to
- *	a FIRM load. Nothing happens if FIRM had been launched previously.
- *
- *	@pre The areas of ITCM with TWL information are intact.
- *	@post TWL keys are setup. Note that this also does use the SHA subsystem, so
- *		the SHA register is modified. This means that under a9lh this overwrites
- *		the OTP hash, so back it up before calling this function.
- *
- *	@post The TWL keyslot is setup properly.
- */
-void ctr_core_twl_keyslot_setup(void);
-
 /**	@brief Powers off the 3DS.
  *
  *	This function does not return. It powers off the 3DS via an i2c call to the
@@ -52,7 +45,7 @@ void ctr_core_twl_keyslot_setup(void);
  *
  *	@post 3DS has powered off.
  */
-void ctr_core_system_poweroff(void);
+CTR_NORETURN void ctr_core_system_poweroff(void);
 
 /**	@brief Resets the 3DS.
  *
@@ -60,7 +53,7 @@ void ctr_core_system_poweroff(void);
  *
  *	@post 3DS has restarted.
  */
-void ctr_core_system_reset(void);
+CTR_NORETURN void ctr_core_system_reset(void);
 
 /**	@brief Returns the enumeration corresponding to the running system.
  *
@@ -70,6 +63,28 @@ ctr_core_system_type ctr_core_get_system_type(void);
 
 #ifdef __cplusplus
 }
+
+namespace ctr_core
+{
+	/**	@brief Class representing the general system.
+	 */
+	class system
+	{
+	public:
+		/**	@brief @See ctr_core_detect_a9lh_entry for details.
+		 */
+		static ctr_core_system_type get_type();
+
+		/**	@brief @See ctr_core_system_reset for details.
+		 */
+		[[ noreturn ]] static void reset();
+
+		/**	@brief @See ctr_core_system_poweroff for details.
+		 */
+		[[ noreturn ]] static void poweroff();
+	};
+}
+
 #endif
 
 #endif//CTR_CORE_SYSTEM_H_
