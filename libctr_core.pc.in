@@ -1,0 +1,12 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: @PACKAGE_NAME@
+Description: Baremetal ARM library for the Nintendo 3DS, used by libctr9 and libctr11
+URL: https://github.com/gemarcano/@PACKAGE_NAME@
+Version: @VERSION@
+Libs: -L$(libdir) -lctr_core
+Cflags: -I(includedir)
+

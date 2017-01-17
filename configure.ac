@@ -42,8 +42,6 @@ AX_GCC_ARCHFLAG([no],
  architecture being targeted. Please specify the architecture via the\
  --with-gcc-arch option.])])
 
-AC_CONFIG_FILES([Makefile src/Makefile])
-
 AC_ARG_ENABLE(3ds-arm11,
 	AS_HELP_STRING([--enable-3ds-arm11],
 	[Enable flags used for compatibility with devKitARM ARM11 libc]))
@@ -65,6 +63,6 @@ AS_IF([test "x$enable_thumb" = "xyes"], [
 	AC_SUBST(THUMBFLAGS)
 ])
 
-
+AC_CONFIG_FILES([Makefile src/Makefile libctr_core.pc])
 AC_OUTPUT
 

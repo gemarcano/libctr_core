@@ -3,6 +3,10 @@ lib
 *.swp
 *.in
 *.o
+*.pc
+*.lo
+*.la
+.libs
 .deps
 doc
 *.a
