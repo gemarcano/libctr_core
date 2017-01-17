@@ -14,7 +14,7 @@
 
 #include <ctr_core/ctr_core_freetype.h>
 
-static ssize_t ctr_core_console_write_r(struct _reent *r, int fd, const char *ptr, size_t len);
+static ssize_t ctr_core_console_write_r(struct _reent *r, void *fd, const char *ptr, size_t len);
 
 static const devoptab_t tab =
 {
@@ -456,7 +456,7 @@ static size_t process_csi(const char *str, size_t len)
 	return i;
 }
 
-static ssize_t ctr_core_console_write_r(struct _reent *r, int fd, const char *ptr, size_t len)
+static ssize_t ctr_core_console_write_r(struct _reent *r, void *fd, const char *ptr, size_t len)
 {
 	for (size_t i = 0; i < len; ++i)
 	{
