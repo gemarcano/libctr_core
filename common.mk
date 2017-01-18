@@ -1,7 +1,7 @@
 INCPATHS=-I$(top_srcdir)/include/ -I$(prefix)/include/freetype2
 
-#SIZE_OPTIMIZATION = -flto
-SIZE_OPTIMIZATION = -Wl,--gc-sections -ffunction-sections
+SIZE_OPTIMIZATION = -flto
+#SIZE_OPTIMIZATION = -Wl,--gc-sections -ffunction-sections
 AM_CPPFLAGS=$(INCPATHS)
 
 AM_CFLAGS= -std=gnu11 -O2 -g -fomit-frame-pointer -ffast-math \
