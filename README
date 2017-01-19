@@ -92,7 +92,6 @@ The Autotools setup assumes that devkitarm is already in the PATH.
  make
 
 Example for ARM11:
-  #first, go edit src/Makefile.am to use C11FLAGS instead of C9FLAGS
   export PATH=${PATH}:${DEVKITPRO}/bin:${DEVKITARM}/bin
   autoreconf -if
   ./configure --host arm-none-eabi --with-gcc-arch=mpcore \
@@ -100,7 +99,6 @@ Example for ARM11:
   make -j10
 
 Example for ARM9:
-  #first, go edit src/Makefile.am to use C9FLAGS instead of C11FLAGS
   export PATH=${PATH}:${DEVKITPRO}/bin:${DEVKITARM}/bin
   autoreconf -if
   ./configure --host arm-none-eabi --with-gcc-arch=arm946e-s \
