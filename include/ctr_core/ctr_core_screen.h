@@ -92,65 +92,6 @@ ctr_core_screen *ctr_core_screen_initialize(uint8_t *framebuffer, size_t width, 
  */
 void ctr_core_screen_destroy(ctr_core_screen *screen);
 
-//FIXME these functions are bound to change. I can't say I'm happy about the API
-
-/**	@brief Returns the screen's width.
- *
- *	@param[in] screen Screen to poll for its width.
- *
- *	@return The width of the given screen.
- */
-size_t ctr_core_screen_get_width(const void *screen);
-
-/**	@brief Returns the screen's height.
- *
- *	@param[in] screen Screen to poll for its height.
- *
- *	@return The height of the given screen.
- */
-size_t ctr_core_screen_get_height(const void *screen);
-
-/**	@brief Retrieves the pixel specified from the given screen.
- *
- *	Note that only the actual size of the pixel, according to the current pixel,
- *	format is guaranteed to be correct. Any bits beyond the actual pixel size
- *	are not guaranteed to be anything useful. E.g. when in one of the 16 bit
- *	modes, the upper 16 bits of the return can be garbage and not zero.
- *	Accessing a pixel outside of the framebuffer invokes undefined behavior.
- *
- *	@param[in] screen Screen to access. Must be initialized.
- *	@param[in] x X location of pixel.
- *	@param[in] y Y location of pixel.
- *
- *	@returns The pixel value at the specified location. The current screen
- *	format governs how many of the returned bits mean anything.
- */
-uint32_t ctr_core_screen_get_pixel(const void *screen, size_t x, size_t y);
-
-/**	@brief Sets the pixel to the value specified in the given screen.
- *
- *	Note that only the actual size of the pixel, according to the current pixel,
- *	format is used for setting the pixel value. Any bits beyond the actual pixel
- *	are ignored. Accessing a pixel outside of the framebuffer invokes undefined
- *	behavior.
- *
- *	@param[in] screen Screen to use for operation. Must be initialized.
- *	@param[in] x X location of pixel.
- *	@param[in] y Y location of pixel.
- *	@param[in] pixel Pixel value to set.
- *
- *	@post The pixel value specified has been set at the given position.
- */
-void ctr_core_screen_set_pixel(void *screen, size_t x, size_t y, uint32_t pixel);
-
-/**	@brief Returns the screen.
- *
- *	@param[in] screen Effectively, the return value.
- *
- *	@returns The screen.
- */
-ctr_core_screen *ctr_core_screen_get_screen(void *screen);
-
 /**	@brief Draws the given bitmap at the given location in the given screen.
  *
  *	The coordinates in the framebuffer given dictate where the upper left corner
@@ -166,16 +107,7 @@ ctr_core_screen *ctr_core_screen_get_screen(void *screen);
  *
  *	@post The bitmap has been drawn at the given location.
  */
-void ctr_core_screen_draw_bitmap(ctr_core_screen *screen, size_t x, size_t y, uint32_t pixel, ctr_core_screen_bitmap *bitmap);
-
-/**	@brief Clears the screen with the given pixel.
- *
- *	@paran[in] screen Screen to clear.
- *	@param[in] pixel Pixel to clear screen with.
- *
- *	@post Screen is cleared with the given pixel.
- */
-void ctr_core_screen_clear(void *screen, uint32_t pixel);
+void ctr_core_screen_draw_bitmap(ctr_core_screen *screen, std::size_t x, std::size_t y, std::uint32_t pixel, ctr_core_screen_bitmap *bitmap);
 
 #ifdef __cplusplus
 }
@@ -209,7 +141,7 @@ namespace ctr_core
 	class generic_screen : public generic_surface
 	{
 	public:
-		generic_screen(std::size_t width, std::size_t height, pixel_format pixel);
+		generic_screen(std::uint8_t *framebuffer, std::size_t width, std::size_t height, pixel_format pixel);
 		virtual std::size_t width() const override;
 		virtual std::size_t height() const override;
 		virtual generic_pixel get_pixel(std::size_t x, std::size_t y) override;
