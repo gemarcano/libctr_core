@@ -106,7 +106,7 @@ static void draw_shift_up(void)
 	{
 		std::uintptr_t begin = reinterpret_cast<std::uintptr_t>(data);
 		std::uintptr_t end = reinterpret_cast<std::uintptr_t>(surface.get_pixel(0,1).get_buffer());
-		offset_to_next_column = end - begin; 
+		offset_to_next_column = end - begin;
 	}
 	unsigned int line_height = ctr_core_console_get_char_height();
 	std::size_t copy_col = (surface.height() - line_height) * screen.pixel_size();

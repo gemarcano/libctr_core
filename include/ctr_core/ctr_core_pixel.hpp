@@ -52,7 +52,7 @@ namespace ctr_core
 	private:
 		std::array<unsigned char, detail::pixel_format_size(pixel_format::RGBA8)> data;
 	};
-	
+
 	template<>
 	class pixel<pixel_format::RGB8>
 	{
@@ -101,7 +101,7 @@ namespace ctr_core
 		generic_pixel(std::uint32_t pixel);
 		std::uint8_t operator[](std::size_t index) const;
 		generic_pixel& operator=(std::uint32_t pixel);
-		generic_pixel& operator=(generic_pixel& pixel);
+		generic_pixel& operator=(const generic_pixel& pixel);
 		const unsigned char *get_buffer() const;
 		unsigned char *get_buffer();
 		std::uint32_t get_value() const;

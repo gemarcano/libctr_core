@@ -110,7 +110,7 @@ namespace ctr_core
 		return *this;
 	}
 
-	generic_pixel& generic_pixel::operator=(generic_pixel& pixel)
+	generic_pixel& generic_pixel::operator=(const generic_pixel& pixel)
 	{
 		buffer_ = pixel.buffer_;
 		format_ = pixel.format_;

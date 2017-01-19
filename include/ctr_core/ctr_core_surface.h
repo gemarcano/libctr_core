@@ -115,7 +115,7 @@ namespace ctr_core
 		virtual const surface& get_screen() const = 0;
 		virtual pixel_format get_pixel_format() const = 0;
 		virtual size_t pixel_size() const = 0;
-		
+
 		virtual void set_pixel(size_t x, size_t y, const pixel_type& pixel) = 0;
 
 		virtual void clear(const pixel_type& pixel) = 0;

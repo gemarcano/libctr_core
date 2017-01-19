@@ -72,3 +72,67 @@ void ctr_core_screen_draw_bitmap(ctr_core_screen *screen, std::size_t x, std::si
 	}
 }
 
+namespace ctr_core
+{
+	generic_screen::generic_screen(std::uint8_t *framebuffer, std::size_t width, std::size_t height, pixel_format format)
+	:framebuffer_(framebuffer), width_(width), height_(height), format_(format)
+	{}
+
+	std::size_t generic_screen::width() const
+	{
+		return width_;
+	}
+
+	std::size_t generic_screen::height() const
+	{
+		return height_;
+	}
+
+	generic_pixel generic_screen::get_pixel(std::size_t x, std::size_t y)
+	{
+		return static_cast<const generic_screen*>(this)->get_pixel(x, y);
+	}
+
+	const generic_pixel generic_screen::get_pixel(std::size_t x, std::size_t y) const
+	{
+		auto ptr = framebuffer_ + ((x * height_) + ((height_ - 1 - y))) * pixel_size();
+		return generic_pixel(ptr, format_);
+	}
+
+	void generic_screen::set_pixel(std::size_t x, std::size_t y, const pixel_type& pixel)
+	{
+		get_pixel(x, y) = pixel;
+	}
+
+	generic_surface& generic_screen::get_screen()
+	{
+		return *this;
+	}
+
+	const generic_surface& generic_screen::get_screen() const
+	{
+		return *this;
+	}
+
+	void generic_screen::clear(const generic_pixel& pixel)
+	{
+		for (std::size_t x = 0; x < width_; ++x)
+		{
+			for(std::size_t y = 0; y < height_; ++y)
+			{
+				get_pixel(x, y) = pixel;
+			}
+		}
+	}
+
+	pixel_format generic_screen::get_pixel_format() const
+	{
+		return format_;
+	}
+
+	std::size_t generic_screen::pixel_size() const
+	{
+		return detail::pixel_format_size(format_);
+	}
+}
+

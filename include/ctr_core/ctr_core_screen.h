@@ -107,7 +107,7 @@ void ctr_core_screen_destroy(ctr_core_screen *screen);
  *
  *	@post The bitmap has been drawn at the given location.
  */
-void ctr_core_screen_draw_bitmap(ctr_core_screen *screen, std::size_t x, std::size_t y, std::uint32_t pixel, ctr_core_screen_bitmap *bitmap);
+void ctr_core_screen_draw_bitmap(ctr_core_screen *screen, size_t x, size_t y, uint32_t pixel, ctr_core_screen_bitmap *bitmap);
 
 #ifdef __cplusplus
 }
@@ -141,7 +141,7 @@ namespace ctr_core
 	class generic_screen : public generic_surface
 	{
 	public:
-		generic_screen(std::uint8_t *framebuffer, std::size_t width, std::size_t height, pixel_format pixel);
+		generic_screen(std::uint8_t *framebuffer, std::size_t width, std::size_t height, pixel_format format);
 		virtual std::size_t width() const override;
 		virtual std::size_t height() const override;
 		virtual generic_pixel get_pixel(std::size_t x, std::size_t y) override;
@@ -153,10 +153,10 @@ namespace ctr_core
 		virtual pixel_format get_pixel_format() const override;
 		virtual std::size_t pixel_size() const override;
 	public:
+		std::uint8_t *framebuffer_;
 		std::size_t width_;
 		std::size_t height_;
-		pixel_format pixel;
-		std::unique_ptr<generic_surface> screen_impl;
+		pixel_format format_;
 	};
 }
 
