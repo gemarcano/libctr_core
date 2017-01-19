@@ -98,7 +98,7 @@ uint8_t ctr_core_i2cReadRegister(uint8_t dev_id, uint8_t reg) {
 }
 
 bool ctr_core_i2cReadRegisterBuffer(uint8_t dev_id, uint8_t reg, uint8_t* buffer, size_t buf_size) {
-    
+
 	if (buf_size)
 	{
 		uint8_t bus_id = ctr_core_i2cGetDeviceBusId(dev_id);
