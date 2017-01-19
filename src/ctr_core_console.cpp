@@ -95,37 +95,30 @@ static void pixel_set(void *buffer, uint32_t pixel, size_t pixel_size, size_t co
 static void draw_shift_up(void)
 {
 	// Buffer is bottom to top, left to right
-	ctr_core_screen *screen = ctr_core_surface_get_screen(console.surface);
-	size_t pixel_size = screen->pixel_size;
-	unsigned int line_height = ctr_core_console_get_char_height();
-	size_t copy_col = (console.height - line_height) * pixel_size;
+	auto& surface = *reinterpret_cast<ctr_core::generic_surface*>(console.surface);
+	auto &screen = surface.get_screen();
 
-	for (size_t x = 0; x < console.width; ++x)
+	size_t offset_to_next_column = 0;
+	//For my own sanity, I am defining that the framebuffer pixels are within is
+	//one large array object. This allows for pointer arithmetic.
+	unsigned char *data = reinterpret_cast<unsigned char*>(surface.get_pixel(0,0).get_buffer());
+	if (surface.width() > 1)
 	{
-		for (size_t y = line_height; y < console.height; ++y)
-		{
-			uint32_t pixel = ctr_core_surface_get_pixel(console.surface, x, y);
-			ctr_core_surface_set_pixel(console.surface, x, y, console.bg);
-			ctr_core_surface_set_pixel(console.surface, x, y - line_height, pixel);
-		}
+		std::uintptr_t begin = reinterpret_cast<std::uintptr_t>(data);
+		std::uintptr_t end = reinterpret_cast<std::uintptr_t>(surface.get_pixel(0,1).get_buffer());
+		offset_to_next_column = end - begin; 
+	}
+	unsigned int line_height = ctr_core_console_get_char_height();
+	size_t copy_col = (surface.height() - line_height) * screen.pixel_size();
+	size_t line_pixels = line_height * screen.pixel_size();
+
+	for (size_t x = 0; x < surface.width(); ++x)
+	{
+		memmove(data, data + line_pixels, copy_col);
+		memset(data + copy_col, 0, line_pixels);
+		data += offset_to_next_column;
 	}
 }
-
-/*static void draw_shift_up(void)
-{
-	// Buffer is bottom to top, left to right
-	ctr_core_screen *screen = ctr_core_surface_get_screen(console.surface);
-	size_t pixel_size = screen->pixel_size;
-	unsigned int line_height = ctr_core_console_get_char_height();
-	size_t copy_col = (console.height - line_height) * pixel_size;
-
-	for (size_t i = 0; i < console.width; ++i)
-	{
-		uint8_t *col = screen->framebuffer + i*console.height*pixel_size;
-		memmove(col + line_height*pixel_size, col, copy_col);
-		pixel_set(col, console.bg, pixel_size, line_height);
-	}
-}*/
 
 void ctr_core_console_draw(char c)
 {

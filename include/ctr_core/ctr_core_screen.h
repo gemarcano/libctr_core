@@ -59,15 +59,7 @@ typedef enum
 
 /**	@brief Represents a single 3DS screen.
  */
-typedef struct ctr_core_screen
-{
-	ctr_core_surface base;
-	uint8_t *framebuffer;
-	size_t width;
-	size_t height;
-	size_t pixel_size;
-	ctr_core_screen_pixel format;
-} ctr_core_screen;
+typedef struct ctr_core_screen ctr_core_screen;
 
 //FIXME currently bitmaps must start at the beginning of a byte
 /**	@brief Represents a single bitmap entity.
@@ -78,7 +70,7 @@ typedef struct
 	void *data;
 } ctr_core_screen_bitmap;
 
-extern ctr_core_screen ctr_screen_top, ctr_screen_bottom;
+extern ctr_core_screen *ctr_screen_top, *ctr_screen_bottom;
 
 /**	@brief Initializes the given screen.
  *
@@ -179,6 +171,57 @@ void ctr_core_screen_clear(void *screen, uint32_t pixel);
 
 #ifdef __cplusplus
 }
+
+#include <ctr_core/ctr_core_pixel.hpp>
+#include <ctr_core/ctr_core_surface.h>
+
+#include <memory>
+
+namespace ctr_core
+{
+	template<class Pixel, size_t Width, size_t Height>
+	class screen
+	{
+	public:
+		typedef Pixel pixel_type;
+
+		screen(Pixel (*framebuffer)[Width]);
+		constexpr size_t width() const;
+		constexpr size_t height() const;
+		Pixel& operator()(size_t x, size_t y);
+		const Pixel& operator()(size_t x, size_t y) const;
+		screen& get_screen();
+		const screen& get_screen() const;
+		void clear(const Pixel& pixel);
+
+	
+	private:
+		Pixel (*framebuffer)[Width];
+	};
+
+	class generic_screen : public generic_surface
+	{
+	public:
+		generic_screen(size_t width, size_t height, pixel_format pixel);
+		virtual size_t width() const override;
+		virtual size_t height() const override;
+		virtual generic_pixel get_pixel(size_t x, size_t y) override;
+		virtual const generic_pixel get_pixel(size_t x, size_t y) const override;
+		virtual void set_pixel(size_t x, size_t y, const pixel_type& pixel) override;
+		virtual surface& get_screen() override;
+		virtual const surface& get_screen() const override;
+		virtual void clear(const generic_pixel& pixel) override;
+		virtual pixel_format get_pixel_format() const override;
+		virtual size_t pixel_size() const override;
+	public:
+		size_t width_;
+		size_t height_;
+		pixel_format pixel;
+		std::unique_ptr<generic_surface> screen_impl;
+	};
+}
+
+#include "ctr_core_screen.ipp"
 #endif
 
 #endif//CTR_CORE_SCREEN_H_

@@ -23,15 +23,7 @@ extern "C" {
 
 /**	@brief Represents a single window within the screen.
  */
-typedef struct
-{
-	ctr_core_surface base;
-	ctr_core_screen *parent;
-	size_t x;
-	size_t y;
-	size_t width;
-	size_t height;
-} ctr_core_window;
+typedef struct ctr_core_window ctr_core_window;
 
 /**	@brief Initializes the given window.
  *
@@ -132,6 +124,52 @@ ctr_core_screen *ctr_core_window_get_screen(void *window);
 void ctr_core_window_clear(void *window, uint32_t pixel);
 
 #ifdef __cplusplus
+}
+
+#include <ctr_core/ctr_core_surface.h>
+#include <memory>
+
+namespace ctr_core
+{
+	template<class Parent, class Width, class Height>
+	class window
+	{
+	public:
+		typedef typename Parent::pixel_type pixel_type;
+
+		window(Parent& parent, size_t x, size_t y);
+		constexpr size_t width() const;
+		constexpr size_t height() const;
+		pixel_type& operator()(size_t x, size_t y);
+		const pixel_type& operator()(size_t x, size_t y) const;
+		Parent& get_parent();
+		const Parent& get_parent() const;
+		void clear(const pixel_type& pixel);
+	};
+
+	class generic_window : public generic_surface
+	{
+	public:
+		generic_window(generic_surface& parent, size_t width, size_t height, size_t x, size_t y);
+		virtual size_t width() const override;
+		virtual size_t height() const override;
+		virtual pixel_type get_pixel(size_t x, size_t y) override;
+		virtual const pixel_type get_pixel(size_t x, size_t y) const override;
+		virtual void set_pixel(size_t x, size_t y, const pixel_type& pixel) override;
+		virtual surface& get_screen() override;
+		virtual const surface& get_screen() const override;
+		virtual void clear(const pixel_type& pixel) override;
+		pixel_format get_pixel_format() const;
+		size_t pixel_size() const;
+
+	public:
+		size_t width_;
+		size_t height_;
+		size_t x_;
+		size_t y_;
+		generic_surface &parent;
+		std::unique_ptr<generic_surface> window_impl;
+	};
 }
 #endif
 

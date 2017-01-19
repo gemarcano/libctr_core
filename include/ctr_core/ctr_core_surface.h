@@ -14,23 +14,15 @@
 #include <stddef.h>
 #include <stdint.h>
 
+struct ctr_core_screen;
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-struct ctr_core_screen;
-
 /**	@brief Represents a single drawable surface.
  */
-typedef struct
-{
-	size_t (*get_width)(const void *surface);
-	size_t (*get_height)(const void *surface);
-	uint32_t (*get_pixel)(const void *surface, size_t x, size_t y);
-	void (*set_pixel)(void *surface, size_t x, size_t y, uint32_t pixel);
-	struct ctr_core_screen *(*get_screen)(void *surface);
-	void (*clear)(void *surface, uint32_t pixel);
-} ctr_core_surface;
+typedef struct ctr_core_surface ctr_core_surface;
 
 //FIXME these functions are bound to change. I can't say I'm happy about the API
 
@@ -101,6 +93,33 @@ struct ctr_core_screen *ctr_core_surface_get_screen(void *surface);
 void ctr_core_surface_clear(void *surface, uint32_t pixel);
 
 #ifdef __cplusplus
+}
+
+#include <ctr_core/ctr_core_pixel.hpp>
+
+namespace ctr_core
+{
+	template<class Pixel>
+	class surface
+	{
+	public:
+		typedef Pixel pixel_type;
+
+		virtual size_t width() const = 0;
+		virtual size_t height() const = 0;
+		virtual pixel_type get_pixel(size_t x, size_t y) = 0;
+		virtual const pixel_type get_pixel(size_t x, size_t y) const = 0;
+		virtual surface& get_screen() = 0;
+		virtual const surface& get_screen() const = 0;
+		virtual pixel_format get_pixel_format() const = 0;
+		virtual size_t pixel_size() const = 0;
+		
+		virtual void set_pixel(size_t x, size_t y, const pixel_type& pixel) = 0;
+
+		virtual void clear(const pixel_type& pixel) = 0;
+	};
+
+	typedef surface<generic_pixel> generic_surface;
 }
 #endif
 
