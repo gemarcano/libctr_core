@@ -16,7 +16,7 @@
 #include <ctr_core/ctr_core_screen.h>
 #include <ctr_core/ctr_core_surface.h>
 
-static ssize_t ctr_core_console_write_r(struct _reent *r, void *fd, const char *ptr, size_t len);
+static ssize_t ctr_core_console_write_r(struct _reent *r, void *fd, const char *ptr, std::size_t len);
 
 static const devoptab_t tab =
 {
@@ -83,11 +83,11 @@ unsigned int ctr_core_console_get_char_height(void)
 	return (unsigned int)(face->size->metrics.height >> 6);
 }
 
-static void pixel_set(void *buffer, uint32_t pixel, size_t pixel_size, size_t count)
+static void pixel_set(void *buffer, std::uint32_t pixel, std::size_t pixel_size, std::size_t count)
 {
-	for (size_t i = 0; i < count; ++i)
+	for (std::size_t i = 0; i < count; ++i)
 	{
-		for (size_t j = 0; j < pixel_size; ++j)
+		for (std::size_t j = 0; j < pixel_size; ++j)
 			((char*)buffer)[i*pixel_size + j] = pixel >> (j*CHAR_BIT);
 	}
 }
@@ -98,7 +98,7 @@ static void draw_shift_up(void)
 	auto& surface = *reinterpret_cast<ctr_core::generic_surface*>(console.surface);
 	auto &screen = surface.get_screen();
 
-	size_t offset_to_next_column = 0;
+	std::size_t offset_to_next_column = 0;
 	//For my own sanity, I am defining that the framebuffer pixels are within is
 	//one large array object. This allows for pointer arithmetic.
 	unsigned char *data = reinterpret_cast<unsigned char*>(surface.get_pixel(0,0).get_buffer());
@@ -109,10 +109,10 @@ static void draw_shift_up(void)
 		offset_to_next_column = end - begin; 
 	}
 	unsigned int line_height = ctr_core_console_get_char_height();
-	size_t copy_col = (surface.height() - line_height) * screen.pixel_size();
-	size_t line_pixels = line_height * screen.pixel_size();
+	std::size_t copy_col = (surface.height() - line_height) * screen.pixel_size();
+	std::size_t line_pixels = line_height * screen.pixel_size();
 
-	for (size_t x = 0; x < surface.width(); ++x)
+	for (std::size_t x = 0; x < surface.width(); ++x)
 	{
 		memmove(data, data + line_pixels, copy_col);
 		memset(data + copy_col, 0, line_pixels);
@@ -144,7 +144,7 @@ void ctr_core_console_draw(char c)
 	if (!(c == '\r' || c == '\n'))
 	{
 		//Can I assume bit->top is always positive for horizontal layouts?
-		size_t off = (ctr_core_console_get_char_height() - (unsigned int)(bit->top));
+		std::size_t off = (ctr_core_console_get_char_height() - (unsigned int)(bit->top));
 		ctr_core_freetype_draw(console.surface, console.xpos, console.ypos + off, c, console.fg, console.bg);
 		console.xpos += cwidth;
 	}
@@ -177,10 +177,10 @@ typedef struct
 	const char *params[2]; //Not supporting more than 2 parameters, rest are ignored
 	unsigned char command;
 
-	size_t bytes_read;
+	std::size_t bytes_read;
 } csi_data;
 
-static csi_state do_csi_initial(csi_data *data, const char *str, size_t i)
+static csi_state do_csi_initial(csi_data *data, const char *str, std::size_t i)
 {
 	memset(data, 0, sizeof(*data));
 	if (isdigit(str[i]))
@@ -197,7 +197,7 @@ static csi_state do_csi_initial(csi_data *data, const char *str, size_t i)
 	return CSI_ERR;
 }
 
-static csi_state do_csi_parameter(csi_data *data, const char *str, size_t i)
+static csi_state do_csi_parameter(csi_data *data, const char *str, std::size_t i)
 {
 	if (str[i] == ';')
 	{
@@ -216,7 +216,7 @@ static csi_state do_csi_parameter(csi_data *data, const char *str, size_t i)
 	return CSI_ERR;
 }
 
-static csi_state do_csi_new_parameter(csi_data *data, const char *str, size_t i)
+static csi_state do_csi_new_parameter(csi_data *data, const char *str, std::size_t i)
 {
 	if (isdigit(str[i]))
 	{
@@ -229,38 +229,38 @@ static csi_state do_csi_new_parameter(csi_data *data, const char *str, size_t i)
 	return CSI_ERR;
 }
 
-static csi_state do_csi_done(csi_data *data, const char *str, size_t i)
+static csi_state do_csi_done(csi_data *data, const char *str, std::size_t i)
 {
 	return CSI_ERR;
 }
 
-typedef csi_state (*csi_func)(csi_data *data, const char *str, size_t i);
+typedef csi_state (*csi_func)(csi_data *data, const char *str, std::size_t i);
 
 static const csi_func state_table[4] =
 {
 	do_csi_initial, do_csi_parameter, do_csi_new_parameter, do_csi_done
 };
 
-static csi_state csi_run(csi_state state, csi_data *data, const char *str, size_t i)
+static csi_state csi_run(csi_state state, csi_data *data, const char *str, std::size_t i)
 {
 	return state_table[state](data, str, i);
 }
 
-static inline size_t extract_param(const char* param, size_t def)
+static inline std::size_t extract_param(const char* param, std::size_t def)
 {
 	return (param) ?
-		(size_t)strtol(param, NULL, 10) :
+		(std::size_t)strtol(param, NULL, 10) :
 		def;
 }
 
-static uint32_t colors[8] = {
+static std::uint32_t colors[8] = {
 	0x00, 0xAA0000, 0x00AA00, 0x808000, 0x0000AA, 0xAA00AA, 0x00AAAA, 0xAAAAAA
 };
 
 static void csi_sgm(const csi_data *data)
 {
-	size_t param1 = extract_param(data->params[0], 0);
-	size_t param2 = extract_param(data->params[1], 0);
+	std::size_t param1 = extract_param(data->params[0], 0);
+	std::size_t param2 = extract_param(data->params[1], 0);
 
 	switch (param1)
 	{
@@ -275,7 +275,7 @@ static void csi_sgm(const csi_data *data)
 		{
 			if (!console.negative)
 			{
-				uint32_t tmp = console.fg;
+				std::uint32_t tmp = console.fg;
 				console.fg = console.bg;
 				console.bg = tmp;
 
@@ -287,7 +287,7 @@ static void csi_sgm(const csi_data *data)
 		case 27:
 			if (console.negative)
 			{
-				uint32_t tmp = console.fg;
+				std::uint32_t tmp = console.fg;
 				console.fg = console.bg;
 				console.bg = tmp;
 
@@ -314,20 +314,20 @@ static void execute_command(const csi_data *data)
 	{
 		case 'A':
 		{
-			uint16_t cheight = (size_t)ctr_core_console_get_char_height();
-			size_t param = extract_param(data->params[0], 1);
+			std::uint16_t cheight = (std::size_t)ctr_core_console_get_char_height();
+			std::size_t param = extract_param(data->params[0], 1);
 
-			size_t pos = console.ypos > (param*cheight) ? console.ypos-(param*cheight) : 0;
+			std::size_t pos = console.ypos > (param*cheight) ? console.ypos-(param*cheight) : 0;
 			//console_adjust_cursor(console.xpos, pos);
 
 		}
 		break;
 		case 'B':
 		{
-			uint16_t cheight = ctr_core_console_get_char_height();
-			size_t param = extract_param(data->params[0], 1);
+			std::uint16_t cheight = ctr_core_console_get_char_height();
+			std::size_t param = extract_param(data->params[0], 1);
 
-			size_t pos = console.ypos + param * cheight;
+			std::size_t pos = console.ypos + param * cheight;
 			if (pos > console.height) pos = console.height - cheight;
 			//console_adjust_cursor(console.xpos, pos);
 		}
@@ -336,9 +336,9 @@ static void execute_command(const csi_data *data)
 		{
 			//The problem here is that cwidth may not be constant
 			unsigned int cwidth = (unsigned int)ctr_core_console_get_char_width('T'); //uh,FIXME, I need to keep track of the text contents...
-			size_t param = extract_param(data->params[0], 1);
+			std::size_t param = extract_param(data->params[0], 1);
 
-			size_t pos = console.xpos + param*cwidth;
+			std::size_t pos = console.xpos + param*cwidth;
 			if (pos > console.width) pos = console.width - cwidth;
 			//console_adjust_cursor(pos, console.ypos);
 		}
@@ -347,19 +347,19 @@ static void execute_command(const csi_data *data)
 		case 'D':
 		{
 			unsigned int cwidth = (unsigned int)ctr_core_console_get_char_width('T'); //uh,FIXME, I need to keep track of the text contents...
-			size_t param = extract_param(data->params[0], 1);
+			std::size_t param = extract_param(data->params[0], 1);
 
-			size_t pos = console.xpos > (param*cwidth) ? console.xpos-(param*cwidth) : 0;
+			std::size_t pos = console.xpos > (param*cwidth) ? console.xpos-(param*cwidth) : 0;
 			//console_adjust_cursor(pos, console.ypos);
 		}
 		break;
 
 		case 'E':
 		{
-			uint16_t cheight = ctr_core_console_get_char_height();
-			size_t param = extract_param(data->params[0], 1);
+			std::uint16_t cheight = ctr_core_console_get_char_height();
+			std::size_t param = extract_param(data->params[0], 1);
 
-			size_t pos = console.ypos + param*cheight;
+			std::size_t pos = console.ypos + param*cheight;
 			if (pos > console.height) pos = console.height - cheight;
 			//console_adjust_cursor(0, pos);
 		}
@@ -367,10 +367,10 @@ static void execute_command(const csi_data *data)
 
 		case 'F':
 		{
-			uint16_t cheight = ctr_core_console_get_char_height();
-			size_t param = extract_param(data->params[0], 1);
+			std::uint16_t cheight = ctr_core_console_get_char_height();
+			std::size_t param = extract_param(data->params[0], 1);
 
-			size_t pos = console.ypos > param*cheight ? console.ypos - param*cheight : 0;
+			std::size_t pos = console.ypos > param*cheight ? console.ypos - param*cheight : 0;
 			//console_adjust_cursor(0, pos);
 		}
 		break;
@@ -378,10 +378,10 @@ static void execute_command(const csi_data *data)
 		case 'G':
 		{
 			unsigned int cwidth = (unsigned int)ctr_core_console_get_char_width('T'); //uh,FIXME, I need to keep track of the text contents...
-			size_t param = extract_param(data->params[0], 1);
+			std::size_t param = extract_param(data->params[0], 1);
 			param -= 1; //Is this indexed 0 or 1 (currently assuming 1)
 
-			size_t pos = param * cwidth < console.width  ? param*cwidth : console.width;
+			std::size_t pos = param * cwidth < console.width  ? param*cwidth : console.width;
 			//console_adjust_cursor(pos, 0);
 
 		}
@@ -390,20 +390,20 @@ static void execute_command(const csi_data *data)
 		case 'f':
 		case 'H':
 		{
-			size_t param1 = extract_param(data->params[0], 1);
-			size_t param2 = extract_param(data->params[1], 1);
+			std::size_t param1 = extract_param(data->params[0], 1);
+			std::size_t param2 = extract_param(data->params[1], 1);
 			unsigned int cwidth = (unsigned int)ctr_core_console_get_char_width('T'); //uh,FIXME, I need to keep track of the text contents...
-			uint16_t cheight = ctr_core_console_get_char_height();
+			std::uint16_t cheight = ctr_core_console_get_char_height();
 
-			size_t posx = param1*cwidth < console.width ? param1*cwidth : console.width;
-			size_t posy = param2*cheight < console.height ? param2*cheight : console.height;
+			std::size_t posx = param1*cwidth < console.width ? param1*cwidth : console.width;
+			std::size_t posy = param2*cheight < console.height ? param2*cheight : console.height;
 			//console_adjust_cursor(posx, posy);
 		}
 		break;
 
 		case 'J':
 		{
-			size_t param = extract_param(data->params[0], 0);
+			std::size_t param = extract_param(data->params[0], 0);
 
 			if (param == 0)
 			{
@@ -422,7 +422,7 @@ static void execute_command(const csi_data *data)
 
 		case 'K':
 		{
-			size_t param = extract_param(data->params[0], 0);
+			std::size_t param = extract_param(data->params[0], 0);
 			//TODO
 		}
 		break;
@@ -450,11 +450,11 @@ static void execute_command(const csi_data *data)
 	}
 }
 
-static size_t process_csi(const char *str, size_t len)
+static std::size_t process_csi(const char *str, std::size_t len)
 {
 	csi_state state = CSI_INITIAL;
 	csi_data data = {0};
-	size_t i;
+	std::size_t i;
 	for (i = 1;
 		state != CSI_DONE &&
 		state != CSI_ERR &&
@@ -471,9 +471,9 @@ static size_t process_csi(const char *str, size_t len)
 	return i;
 }
 
-static ssize_t ctr_core_console_write_r(struct _reent *r, void *fd, const char *ptr, size_t len)
+static ssize_t ctr_core_console_write_r(struct _reent *r, void *fd, const char *ptr, std::size_t len)
 {
-	for (size_t i = 0; i < len; ++i)
+	for (std::size_t i = 0; i < len; ++i)
 	{
 		if (ptr[i] == 0x1B)
 		{

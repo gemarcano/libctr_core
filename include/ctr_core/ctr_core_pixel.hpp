@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (C) 2016 Gabriel Marcano
+ *
+ * Refer to the COPYING.txt file at the top of the project directory. If that is
+ * missing, this file is licensed under the GPL version 2.0 or later.
+ *
+ ******************************************************************************/
+
+/** @file */
+
 #ifndef CTR_CORE_PIXEL_HPP_
 #define CTR_CORE_PIXEL_HPP_
 
@@ -16,7 +26,7 @@ namespace ctr_core
 
 	namespace detail
 	{
-		constexpr size_t pixel_format_size(pixel_format format)
+		constexpr std::size_t pixel_format_size(pixel_format format)
 		{
 			switch (format)
 			{
@@ -37,7 +47,7 @@ namespace ctr_core
 	class pixel<pixel_format::RGBA8>
 	{
 	public:
-		uint8_t operator[](size_t index) const;
+		std::uint8_t operator[](std::size_t index) const;
 
 	private:
 		std::array<unsigned char, detail::pixel_format_size(pixel_format::RGBA8)> data;
@@ -47,7 +57,7 @@ namespace ctr_core
 	class pixel<pixel_format::RGB8>
 	{
 	public:
-		uint8_t operator[](size_t index) const;
+		std::uint8_t operator[](std::size_t index) const;
 
 	private:
 		std::array<unsigned char, detail::pixel_format_size(pixel_format::RGB8)> data;
@@ -57,7 +67,7 @@ namespace ctr_core
 	class pixel<pixel_format::RGB565>
 	{
 	public:
-		uint8_t operator[](size_t index) const;
+		std::uint8_t operator[](std::size_t index) const;
 
 	private:
 		std::array<unsigned char, detail::pixel_format_size(pixel_format::RGB565)> data;
@@ -67,7 +77,7 @@ namespace ctr_core
 	class pixel<pixel_format::A1_RGB5>
 	{
 	public:
-		uint8_t operator[](size_t index) const;
+		std::uint8_t operator[](std::size_t index) const;
 
 	private:
 		std::array<unsigned char, detail::pixel_format_size(pixel_format::A1_RGB5)> data;
@@ -77,7 +87,7 @@ namespace ctr_core
 	class pixel<pixel_format::RGBA4>
 	{
 	public:
-		uint8_t operator[](size_t index) const;
+		std::uint8_t operator[](std::size_t index) const;
 
 	private:
 		std::array<unsigned char, detail::pixel_format_size(pixel_format::RGBA4)> data;
@@ -88,12 +98,13 @@ namespace ctr_core
 	public:
 		generic_pixel(unsigned char *buffer, pixel_format format);
 		generic_pixel(const generic_pixel& pixel);
-		generic_pixel(uint32_t pixel);
-		uint8_t operator[](size_t index) const;
-		generic_pixel& operator=(uint32_t pixel);
+		generic_pixel(std::uint32_t pixel);
+		std::uint8_t operator[](std::size_t index) const;
+		generic_pixel& operator=(std::uint32_t pixel);
 		generic_pixel& operator=(generic_pixel& pixel);
 		const unsigned char *get_buffer() const;
 		unsigned char *get_buffer();
+		std::uint32_t get_value() const;
 
 	private:
 		unsigned char *buffer_;

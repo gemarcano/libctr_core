@@ -11,35 +11,32 @@
 #include <ctr_core/ctr_core_system.h>
 #include <ctr_core/ctr_core_i2c.h>
 
-#include <stdint.h>
-#include <stdbool.h>
+#include <cstdint>
 
-#define PDN_MPCORE_CFG ((volatile uint8_t*)0x10140FFC)
-#define PDN_SPI_CNT ((volatile uint8_t*)0x101401C0)
+#define PDN_MPCORE_CFG reinterpret_cast<volatile std::uint8_t*>(0x10140FFC)
+#define PDN_SPI_CNT reinterpret_cast<volatile std::uint8_t*>(0x101401C0)
 
-extern "C"
+ctr_core_system_type ctr_core_get_system_type(void)
 {
-	ctr_core_system_type ctr_core_get_system_type(void)
-	{
-		return ctr_core::system::get_type();
-	}
-
-	bool ctr_core_detect_a9lh_entry(void)
-	{
-		//Aurora determined that this register isn't yet set when a9lh launches.
-		return *PDN_SPI_CNT == 0;
-	}
-
-	void ctr_core_system_poweroff(void)
-	{
-		ctr_core::system::poweroff();
-	}
-
-	void ctr_core_system_reset(void)
-	{
-		ctr_core::system::reset();
-	}
+	return ctr_core::system::get_type();
 }
+
+bool ctr_core_detect_a9lh_entry(void)
+{
+	//Aurora determined that this register isn't yet set when a9lh launches.
+	return *PDN_SPI_CNT == 0;
+}
+
+void ctr_core_system_poweroff(void)
+{
+	ctr_core::system::poweroff();
+}
+
+void ctr_core_system_reset(void)
+{
+	ctr_core::system::reset();
+}
+
 namespace ctr_core
 {
 	ctr_core_system_type system::get_type()

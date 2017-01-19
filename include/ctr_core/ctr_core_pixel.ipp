@@ -1,27 +1,36 @@
+/*******************************************************************************
+ * Copyright (C) 2016 Gabriel Marcano
+ *
+ * Refer to the COPYING.txt file at the top of the project directory. If that is
+ * missing, this file is licensed under the GPL version 2.0 or later.
+ *
+ ******************************************************************************/
+
 #include <cstdint>
 #include <cstddef>
+#include <climits>
 
 namespace ctr_core
 {
 	namespace detail
 	{
 		template<pixel_format>
-		std::uint8_t pixel_get(const uint8_t *data, std::size_t index);
-		
+		std::uint8_t pixel_get(const std::uint8_t *data, std::size_t index);
+
 		template<>
-		std::uint8_t pixel_get<pixel_format::RGBA8>(const uint8_t *data, std::size_t index)
+		std::uint8_t pixel_get<pixel_format::RGBA8>(const std::uint8_t *data, std::size_t index)
 		{
 			return data[index];
 		}
 
 		template<>
-		std::uint8_t pixel_get<pixel_format::RGB8>(const uint8_t *data, std::size_t index)
+		std::uint8_t pixel_get<pixel_format::RGB8>(const std::uint8_t *data, std::size_t index)
 		{
 			return data[index];
 		}
 
 		template<>
-		std::uint8_t pixel_get<pixel_format::RGB565>(const uint8_t *data, std::size_t index)
+		std::uint8_t pixel_get<pixel_format::RGB565>(const std::uint8_t *data, std::size_t index)
 		{
 			std::uint8_t result;
 			switch (index)
@@ -38,7 +47,7 @@ namespace ctr_core
 		}
 
 		template<>
-		std::uint8_t pixel_get<pixel_format::A1_RGB5>(const uint8_t *data, std::size_t index)
+		std::uint8_t pixel_get<pixel_format::A1_RGB5>(const std::uint8_t *data, std::size_t index)
 		{
 			switch (index)
 			{
@@ -51,7 +60,7 @@ namespace ctr_core
 		}
 
 		template<>
-		std::uint8_t pixel_get<pixel_format::RGBA4>(const uint8_t *data, std::size_t index)
+		std::uint8_t pixel_get<pixel_format::RGBA4>(const std::uint8_t *data, std::size_t index)
 		{
 			if (index & 0x1) return data[index/2] >> 4;
 			return data[index/2] & 0xF;
@@ -88,6 +97,26 @@ namespace ctr_core
 	:buffer_(buffer), format_(format)
 	{}
 
+	generic_pixel::generic_pixel(const generic_pixel& pixel)
+	:buffer_(pixel.buffer_), format_(pixel.format_)
+	{}
+
+	generic_pixel& generic_pixel::operator=(std::uint32_t pixel)
+	{
+		for (std::size_t i = 0; i < detail::pixel_format_size(format_); ++i)
+		{
+			buffer_[i] = (pixel >> (CHAR_BIT*i)) & 0xFF;
+		}
+		return *this;
+	}
+
+	generic_pixel& generic_pixel::operator=(generic_pixel& pixel)
+	{
+		buffer_ = pixel.buffer_;
+		format_ = pixel.format_;
+		return *this;
+	}
+
 	std::uint8_t generic_pixel::operator[](std::size_t index) const
 	{
 		switch(format_)
@@ -105,5 +134,27 @@ namespace ctr_core
 			default: return 0;
 		}
 	}
+
+	const unsigned char *generic_pixel::get_buffer() const
+	{
+		return buffer_;
+	}
+
+	unsigned char *generic_pixel::get_buffer()
+	{
+		return buffer_;
+	}
+
+	std::uint32_t generic_pixel::get_value() const
+	{
+		std::uint32_t result = 0;
+		for (std::size_t i = 0; i < detail::pixel_format_size(format_); ++i)
+		{
+			result |= static_cast<std::uint32_t>(buffer_[i]) << (CHAR_BIT*i);
+		}
+		return result;
+	}
+
+
 }
 

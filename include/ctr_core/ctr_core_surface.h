@@ -105,6 +105,8 @@ namespace ctr_core
 	public:
 		typedef Pixel pixel_type;
 
+		virtual ~surface() = 0;
+
 		virtual size_t width() const = 0;
 		virtual size_t height() const = 0;
 		virtual pixel_type get_pixel(size_t x, size_t y) = 0;

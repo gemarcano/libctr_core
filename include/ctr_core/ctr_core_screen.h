@@ -72,17 +72,25 @@ typedef struct
 
 extern ctr_core_screen *ctr_screen_top, *ctr_screen_bottom;
 
-/**	@brief Initializes the given screen.
+/**	@brief Creates a screen object.
  *
- *	@param[out] screen Screen structure to initialize.
  *	@param[in] framebuffer Pointer to framebuffer in memory.
  *	@param[in] width Width of the framebuffer in pixels.
  *	@param[in] height Height of the framebuffer in pixels.
  *	@param[in] format Format of the pixels in the framebuffer.
  *
- *	@post The screen object has been initialized and is ready for use.
+ *	@returns A pointer to memory holding the created screen object.
  */
-void ctr_core_screen_initialize(ctr_core_screen *screen, uint8_t *framebuffer, size_t width, size_t height, ctr_core_screen_pixel format);
+ctr_core_screen *ctr_core_screen_initialize(uint8_t *framebuffer, size_t width, size_t height, ctr_core_screen_pixel format);
+
+/**	@brief Frees the resources held by the given screen.
+ *
+ *	@param[in] screen Screen to free.
+ *
+ *	@post The given screen has been deallocated. Further use of the object will
+ *		lead to undefined behavior.
+ */
+void ctr_core_screen_destroy(ctr_core_screen *screen);
 
 //FIXME these functions are bound to change. I can't say I'm happy about the API
 
@@ -179,22 +187,21 @@ void ctr_core_screen_clear(void *screen, uint32_t pixel);
 
 namespace ctr_core
 {
-	template<class Pixel, size_t Width, size_t Height>
+	template<class Pixel, std::size_t Width, std::size_t Height>
 	class screen
 	{
 	public:
 		typedef Pixel pixel_type;
 
 		screen(Pixel (*framebuffer)[Width]);
-		constexpr size_t width() const;
-		constexpr size_t height() const;
-		Pixel& operator()(size_t x, size_t y);
-		const Pixel& operator()(size_t x, size_t y) const;
+		constexpr std::size_t width() const;
+		constexpr std::size_t height() const;
+		Pixel& operator()(std::size_t x, std::size_t y);
+		const Pixel& operator()(std::size_t x, std::size_t y) const;
 		screen& get_screen();
 		const screen& get_screen() const;
 		void clear(const Pixel& pixel);
 
-	
 	private:
 		Pixel (*framebuffer)[Width];
 	};
@@ -202,20 +209,20 @@ namespace ctr_core
 	class generic_screen : public generic_surface
 	{
 	public:
-		generic_screen(size_t width, size_t height, pixel_format pixel);
-		virtual size_t width() const override;
-		virtual size_t height() const override;
-		virtual generic_pixel get_pixel(size_t x, size_t y) override;
-		virtual const generic_pixel get_pixel(size_t x, size_t y) const override;
-		virtual void set_pixel(size_t x, size_t y, const pixel_type& pixel) override;
+		generic_screen(std::size_t width, std::size_t height, pixel_format pixel);
+		virtual std::size_t width() const override;
+		virtual std::size_t height() const override;
+		virtual generic_pixel get_pixel(std::size_t x, std::size_t y) override;
+		virtual const generic_pixel get_pixel(std::size_t x, std::size_t y) const override;
+		virtual void set_pixel(std::size_t x, std::size_t y, const pixel_type& pixel) override;
 		virtual surface& get_screen() override;
 		virtual const surface& get_screen() const override;
 		virtual void clear(const generic_pixel& pixel) override;
 		virtual pixel_format get_pixel_format() const override;
-		virtual size_t pixel_size() const override;
+		virtual std::size_t pixel_size() const override;
 	public:
-		size_t width_;
-		size_t height_;
+		std::size_t width_;
+		std::size_t height_;
 		pixel_format pixel;
 		std::unique_ptr<generic_surface> screen_impl;
 	};
