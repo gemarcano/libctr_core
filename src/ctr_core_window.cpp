@@ -16,8 +16,3 @@ void ctr_core_window_destroy(ctr_core_window *window)
 	delete reinterpret_cast<ctr_core::generic_window*>(window);
 }
 
-void ctr_core_window_draw_bitmap(ctr_core_window *window, std::size_t x, std::size_t y, std::uint32_t pixel, ctr_core_screen_bitmap *bitmap)
-{
-	//ctr_core_screen_draw_bitmap(window->parent, window->x + x, window->y + y, pixel, bitmap);
-}
-

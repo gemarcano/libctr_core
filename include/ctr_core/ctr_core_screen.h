@@ -61,15 +61,6 @@ typedef enum
  */
 typedef struct ctr_core_screen ctr_core_screen;
 
-//FIXME currently bitmaps must start at the beginning of a byte
-/**	@brief Represents a single bitmap entity.
- */
-typedef struct
-{
-	size_t width, height;
-	void *data;
-} ctr_core_screen_bitmap;
-
 extern ctr_core_screen *ctr_screen_top, *ctr_screen_bottom;
 
 /**	@brief Creates a screen object.
@@ -91,23 +82,6 @@ ctr_core_screen *ctr_core_screen_initialize(uint8_t *framebuffer, size_t width, 
  *		lead to undefined behavior.
  */
 void ctr_core_screen_destroy(ctr_core_screen *screen);
-
-/**	@brief Draws the given bitmap at the given location in the given screen.
- *
- *	The coordinates in the framebuffer given dictate where the upper left corner
- *	of the bitmap will be drawn. If the bitmap is placed in the framebuffer such
- *	that it will overflow outside of the framebuffer, this invokes undefined
- *	behavior.
- *
- *	@param[in] screen Screen to use for operation. Must be initialized.
- *	@param[in] x X location of pixel.
- *	@param[in] y Y location of pixel.
- *	@param[in] pixel Pixel to use as color when drawing bitmap.
- *	@param[in] bitmap Bitmap to draw.
- *
- *	@post The bitmap has been drawn at the given location.
- */
-void ctr_core_screen_draw_bitmap(ctr_core_screen *screen, size_t x, size_t y, uint32_t pixel, ctr_core_screen_bitmap *bitmap);
 
 #ifdef __cplusplus
 }

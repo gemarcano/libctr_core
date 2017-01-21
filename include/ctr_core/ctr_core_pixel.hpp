@@ -98,7 +98,6 @@ namespace ctr_core
 	public:
 		generic_pixel(unsigned char *buffer, pixel_format format);
 		generic_pixel(const generic_pixel& pixel);
-		generic_pixel(std::uint32_t pixel);
 		std::uint8_t operator[](std::size_t index) const;
 		generic_pixel& operator=(std::uint32_t pixel);
 		generic_pixel& operator=(const generic_pixel& pixel);
@@ -112,8 +111,6 @@ namespace ctr_core
 	};
 
 }
-
-#include "ctr_core_pixel.ipp"
 
 #endif//CTR_CORE_PIXEL_HPP_
 

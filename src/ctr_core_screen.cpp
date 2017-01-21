@@ -49,29 +49,6 @@ void ctr_core_screen_destroy(ctr_core_screen *screen)
 	delete reinterpret_cast<ctr_core::generic_screen*>(screen);
 }
 
-void ctr_core_screen_draw_bitmap(ctr_core_screen *screen, std::size_t x, std::size_t y, std::uint32_t pixel, ctr_core_screen_bitmap *bitmap)
-{
-	if (bitmap->width && bitmap->height)
-	{
-		std::uint8_t *data = reinterpret_cast<unsigned char*>(bitmap->data);
-		std::size_t width_bytes = bitmap->width / 8u;
-		if (bitmap->width % 8) width_bytes++;
-
-		for (std::size_t i = 0; i < bitmap->width; ++i)
-		{
-			std::size_t byte = i/8;
-			std::size_t bit = 7 - i%8;
-			for (std::size_t j = bitmap->height-1; j < bitmap->height; --j)
-			{
-				if (data[byte + width_bytes * j] & (1u << bit))
-				{
-					//ctr_core_screen_set_pixel(screen, x + i, y + j, pixel);
-				}
-			}
-		}
-	}
-}
-
 namespace ctr_core
 {
 	generic_screen::generic_screen(std::uint8_t *framebuffer, std::size_t width, std::size_t height, pixel_format format)

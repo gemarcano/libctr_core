@@ -4,6 +4,10 @@
 #include <stddef.h>
 #include <stdbool.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct
 {
 	unsigned char *buffer;
@@ -18,6 +22,10 @@ bool ctr_core_circular_buffer_pop_front(ctr_core_circular_buffer *buffer, char *
 bool ctr_core_circular_buffer_get(ctr_core_circular_buffer *buffer, size_t index, char *data);
 size_t ctr_core_circular_buffer_size(ctr_core_circular_buffer *buffer);
 size_t ctr_core_circular_buffer_count(ctr_core_circular_buffer *buffer);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif//CTR_CORE_CIRCULAR_BUFFER_H_
 

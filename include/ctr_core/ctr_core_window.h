@@ -46,23 +46,6 @@ ctr_core_window *ctr_core_window_initialize(ctr_core_screen *parent, size_t x, s
  */
 void ctr_core_window_destroy(ctr_core_window *window);
 
-/**	@brief Draws the given bitmap at the given location in the given window.
- *
- *	The coordinates in the framebuffer given dictate where the upper left corner
- *	of the bitmap will be drawn. If the bitmap is placed in the framebuffer such
- *	that it will overflow outside of the framebuffer, this invokes undefined
- *	behavior.
- *
- *	@param[in] window Window to use for operation. Must be initialized.
- *	@param[in] x X location of pixel.
- *	@param[in] y Y location of pixel.
- *	@param[in] pixel Pixel to use as color when drawing bitmap.
- *	@param[in] bitmap Bitmap to draw.
- *
- *	@post The bitmap has been drawn at the given location.
- */
-void ctr_core_window_draw_bitmap(ctr_core_window *window, size_t x, size_t y, uint32_t pixel, ctr_core_screen_bitmap *bitmap);
-
 #ifdef __cplusplus
 }
 

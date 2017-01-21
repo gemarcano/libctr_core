@@ -101,11 +101,12 @@ static void draw_shift_up(void)
 	std::size_t offset_to_next_column = 0;
 	//For my own sanity, I am defining that the framebuffer pixels are within is
 	//one large array object. This allows for pointer arithmetic.
-	unsigned char *data = reinterpret_cast<unsigned char*>(surface.get_pixel(0,0).get_buffer());
+	size_t height = surface.height();
+	unsigned char *data = reinterpret_cast<unsigned char*>(surface.get_pixel(0, height-1).get_buffer());
 	if (surface.width() > 1)
 	{
 		std::uintptr_t begin = reinterpret_cast<std::uintptr_t>(data);
-		std::uintptr_t end = reinterpret_cast<std::uintptr_t>(surface.get_pixel(0,1).get_buffer());
+		std::uintptr_t end = reinterpret_cast<std::uintptr_t>(surface.get_pixel(1, height-1).get_buffer());
 		offset_to_next_column = end - begin;
 	}
 	unsigned int line_height = ctr_core_console_get_char_height();
@@ -114,8 +115,8 @@ static void draw_shift_up(void)
 
 	for (std::size_t x = 0; x < surface.width(); ++x)
 	{
-		memmove(data, data + line_pixels, copy_col);
-		memset(data + copy_col, 0, line_pixels);
+		memmove(data + line_pixels, data, copy_col);
+		memset(data, 0, line_pixels);
 		data += offset_to_next_column;
 	}
 }

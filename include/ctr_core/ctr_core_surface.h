@@ -92,6 +92,32 @@ struct ctr_core_screen *ctr_core_surface_get_screen(void *surface);
  */
 void ctr_core_surface_clear(void *surface, uint32_t pixel);
 
+//FIXME currently bitmaps must start at the beginning of a byte
+/**	@brief Represents a single bitmap entity.
+ */
+typedef struct
+{
+	size_t width, height;
+	void *data;
+} ctr_core_surface_bitmap;
+
+/**	@brief Draws the given bitmap at the given location in the given surface.
+ *
+ *	The coordinates in the framebuffer given dictate where the upper left corner
+ *	of the bitmap will be drawn. If the bitmap is placed in the framebuffer such
+ *	that it will overflow outside of the framebuffer, this invokes undefined
+ *	behavior.
+ *
+ *	@param[in] surface Surface to use for operation. Must be initialized.
+ *	@param[in] x X location of pixel.
+ *	@param[in] y Y location of pixel.
+ *	@param[in] pixel Pixel to use as color when drawing bitmap.
+ *	@param[in] bitmap Bitmap to draw.
+ *
+ *	@post The bitmap has been drawn at the given location.
+ */
+void ctr_core_surface_draw_bitmap(void *surface, size_t x, size_t y, uint32_t pixel, ctr_core_surface_bitmap *bitmap);
+
 #ifdef __cplusplus
 }
 
@@ -105,7 +131,7 @@ namespace ctr_core
 	public:
 		typedef Pixel pixel_type;
 
-		virtual ~surface() = 0;
+		virtual ~surface() = default;
 
 		virtual size_t width() const = 0;
 		virtual size_t height() const = 0;
