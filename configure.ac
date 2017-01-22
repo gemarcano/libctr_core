@@ -4,7 +4,6 @@ AM_INIT_AUTOMAKE([foreign no-dist-gzip dist-xz subdir-objects])
 #Find AR and RANLIB for lto support before initializing libtool
 AC_CHECK_TOOL([AR],gcc-ar)
 AC_CHECK_TOOL([RANLIB],gcc-ranlib)
-LT_INIT
 
 AC_PROG_CC
 AC_PROG_CXX
@@ -63,6 +62,13 @@ AS_IF([test "x$enable_thumb" = "xyes"], [
 	THUMBFLAGS="-mthumb -mthumb-interwork"
 	AC_SUBST(THUMBFLAGS)
 ])
+
+CFLAGS="$CFLAGS $MACHINE_CFLAGS $THUMBFLAGS $C11FLAGS"
+CXXFLAGS="$CXXFLAGS $MACHINE_CFLAGS $THUMBFLAGS $C11FLAGS"
+
+#Make sure the libtool checks happen after C*FLAGS are updated so it picks up
+#those changes.
+LT_INIT
 
 AC_CONFIG_FILES([Makefile src/Makefile libctr_core.pc])
 AC_OUTPUT
