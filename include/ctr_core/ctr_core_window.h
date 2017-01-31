@@ -49,9 +49,6 @@ void ctr_core_window_destroy(ctr_core_window *window);
 #ifdef __cplusplus
 }
 
-#include <ctr_core/ctr_core_surface.h>
-#include <memory>
-
 namespace ctr_core
 {
 	template<class Parent, std::size_t Width, std::size_t Height>
@@ -68,6 +65,10 @@ namespace ctr_core
 		Parent& get_parent();
 		const Parent& get_parent() const;
 		void clear(const pixel_type& pixel);
+	private:
+		Parent& parent_;
+		size_t x_;
+		size_t y_;
 	};
 
 	class generic_window : public generic_surface
@@ -76,22 +77,20 @@ namespace ctr_core
 		generic_window(generic_surface& parent, size_t width, size_t height, size_t x, size_t y);
 		virtual size_t width() const override;
 		virtual size_t height() const override;
-		virtual pixel_type get_pixel(size_t x, size_t y) override;
-		virtual const pixel_type get_pixel(size_t x, size_t y) const override;
-		virtual void set_pixel(size_t x, size_t y, const pixel_type& pixel) override;
-		virtual surface& get_screen() override;
-		virtual const surface& get_screen() const override;
+		virtual generic_pixel operator()(size_t x, size_t y) override;
+		virtual const generic_pixel operator()(size_t x, size_t y) const override;
+		virtual generic_surface& get_screen() override;
+		virtual const generic_surface& get_screen() const override;
 		virtual void clear(const pixel_type& pixel) override;
 		pixel_format get_pixel_format() const;
 		size_t pixel_size() const;
 
 	public:
+		generic_surface& parent_;
 		size_t width_;
 		size_t height_;
 		size_t x_;
 		size_t y_;
-		generic_surface &parent;
-		std::unique_ptr<generic_surface> window_impl;
 	};
 }
 #endif

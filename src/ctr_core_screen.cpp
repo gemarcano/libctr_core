@@ -40,8 +40,8 @@ void ctr_core_screen_disable_backlight(ctr_core_screen_enum aScreens)
 
 ctr_core_screen *ctr_core_screen_initialize(std::uint8_t *framebuffer, std::size_t width, std::size_t height, ctr_core_screen_pixel format)
 {
-	auto result = new ctr_core::generic_screen(framebuffer, width, height, static_cast<ctr_core::pixel_format>(format));
-	return reinterpret_cast<ctr_core_screen*>(result);
+	auto screen = new(std::nothrow) ctr_core::generic_screen(framebuffer, width, height, static_cast<ctr_core::pixel_format>(format));
+	return reinterpret_cast<ctr_core_screen*>(screen);
 }
 
 void ctr_core_screen_destroy(ctr_core_screen *screen)
@@ -65,20 +65,16 @@ namespace ctr_core
 		return height_;
 	}
 
-	generic_pixel generic_screen::get_pixel(std::size_t x, std::size_t y)
+	generic_pixel generic_screen::operator()(std::size_t x, std::size_t y)
 	{
-		return static_cast<const generic_screen*>(this)->get_pixel(x, y);
+		return static_cast<const generic_screen*>(this)->operator()(x, y);
 	}
 
-	const generic_pixel generic_screen::get_pixel(std::size_t x, std::size_t y) const
+	const generic_pixel generic_screen::operator()(std::size_t x, std::size_t y) const
 	{
-		auto ptr = framebuffer_ + ((x * height_) + ((height_ - 1 - y))) * pixel_size();
+		std::size_t pixel_size = detail::pixel_format_size(format_);
+		auto ptr = framebuffer_ + ((x * height_) + ((height_ - 1 - y))) * pixel_size;
 		return generic_pixel(ptr, format_);
-	}
-
-	void generic_screen::set_pixel(std::size_t x, std::size_t y, const pixel_type& pixel)
-	{
-		get_pixel(x, y) = pixel;
 	}
 
 	generic_surface& generic_screen::get_screen()
@@ -97,19 +93,9 @@ namespace ctr_core
 		{
 			for(std::size_t y = 0; y < height_; ++y)
 			{
-				get_pixel(x, y) = pixel;
+				operator()(x, y) = pixel;
 			}
 		}
-	}
-
-	pixel_format generic_screen::get_pixel_format() const
-	{
-		return format_;
-	}
-
-	std::size_t generic_screen::pixel_size() const
-	{
-		return detail::pixel_format_size(format_);
 	}
 }
 

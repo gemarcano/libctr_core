@@ -1,13 +1,104 @@
 #include <ctr_core/ctr_core_pixel.hpp>
 #include <climits>
+#include <new>
 
 namespace ctr_core
 {
+	class generic_pixel_impl
+	{
+	public:
+		~generic_pixel_impl() = default;
+		virtual std::uint8_t at(unsigned char *data, std::size_t index) const = 0;
+		virtual std::size_t size() const = 0;
+		virtual generic_pixel_impl& set(unsigned char *data, const unsigned char *src) = 0;
+	};
+
+	template<class Pixel>
+	class generic_pixel_impl_ : public generic_pixel_impl
+	{
+	public:
+		typedef Pixel pixel_type;
+
+		virtual std::uint8_t at(unsigned char *data, std::size_t index) const override
+		{
+			return Pixel(data)[index];
+		}
+
+		virtual std::size_t size() const override
+		{
+			return Pixel(nullptr).size();
+		}
+
+		virtual generic_pixel_impl& set(unsigned char *data, const unsigned char *src) override
+		{
+			Pixel pix(data);
+			pix = src;
+			return *this;
+		}
+	};
+
 	namespace detail
 	{
-		template<pixel_format>
-		std::uint8_t pixel_get(const std::uint8_t *data, std::size_t index);
+		static generic_pixel_impl_<pixel<pixel_format::RGBA8>> pix_rgba8;
+		static generic_pixel_impl_<pixel<pixel_format::RGB8>> pix_rgb8;
+		static generic_pixel_impl_<pixel<pixel_format::RGB565>> pix_rgb565;
+		static generic_pixel_impl_<pixel<pixel_format::A1_RGB5>> pix_a1_rgb5;
+		static generic_pixel_impl_<pixel<pixel_format::RGBA4>> pix_rgba4;
+	}
 
+	generic_pixel::generic_pixel(unsigned char *data, pixel_format format)
+	:data_(data), format_(format)
+	{
+		switch(format_)
+		{
+			case pixel_format::RGBA8:
+				impl_ = &detail::pix_rgba8;
+				break;
+			case pixel_format::RGB8:
+				impl_ = &detail::pix_rgb8;
+				break;
+			case pixel_format::RGB565:
+				impl_ = &detail::pix_rgb565;
+				break;
+			case pixel_format::A1_RGB5:
+				impl_ = &detail::pix_a1_rgb5;
+				break;
+			case pixel_format::RGBA4:
+				impl_ = &detail::pix_rgba4;
+				break;
+			default:
+				impl_ = nullptr;
+		}
+	}
+
+	unsigned char *generic_pixel::data()
+	{
+		return data_;
+	}
+
+	const unsigned char *generic_pixel::data() const
+	{
+		return data_;
+	}
+
+	std::uint8_t generic_pixel::operator[](std::size_t index) const
+	{
+		return impl_->at(data_, index);
+	}
+
+	std::size_t generic_pixel::size() const
+	{
+		return impl_->size();
+	}
+
+	generic_pixel& generic_pixel::operator=(const unsigned char *data)
+	{
+		impl_->set(data_, data);
+		return *this;
+	}
+
+	namespace detail
+	{
 		template<>
 		std::uint8_t pixel_get<pixel_format::RGBA8>(const std::uint8_t *data, std::size_t index)
 		{
@@ -56,94 +147,6 @@ namespace ctr_core
 			if (index & 0x1) return data[index/2] >> 4;
 			return data[index/2] & 0xF;
 		}
-
 	}
-
-	std::uint8_t pixel<pixel_format::RGBA8>::operator[](std::size_t index) const
-	{
-		return detail::pixel_get<pixel_format::RGBA8>(&data[0], index);
-	}
-
-	std::uint8_t pixel<pixel_format::RGB8>::operator[](std::size_t index) const
-	{
-		return detail::pixel_get<pixel_format::RGB8>(&data[0], index);
-	}
-
-	std::uint8_t pixel<pixel_format::RGB565>::operator[](std::size_t index) const
-	{
-		return detail::pixel_get<pixel_format::RGB565>(&data[0], index);
-	}
-
-	std::uint8_t pixel<pixel_format::A1_RGB5>::operator[](std::size_t index) const
-	{
-		return detail::pixel_get<pixel_format::A1_RGB5>(&data[0], index);
-	}
-
-	std::uint8_t pixel<pixel_format::RGBA4>::operator[](std::size_t index) const
-	{
-		return detail::pixel_get<pixel_format::RGBA4>(&data[0], index);
-	}
-
-	generic_pixel::generic_pixel(unsigned char *buffer, pixel_format format)
-	:buffer_(buffer), format_(format)
-	{}
-
-	generic_pixel::generic_pixel(const generic_pixel& pixel)
-	:buffer_(pixel.buffer_), format_(pixel.format_)
-	{}
-
-	generic_pixel& generic_pixel::operator=(std::uint32_t pixel)
-	{
-		for (std::size_t i = 0; i < detail::pixel_format_size(format_); ++i)
-		{
-			buffer_[i] = (pixel >> (CHAR_BIT*i)) & 0xFF;
-		}
-		return *this;
-	}
-
-	generic_pixel& generic_pixel::operator=(const generic_pixel& pixel)
-	{
-		buffer_ = pixel.buffer_;
-		format_ = pixel.format_;
-		return *this;
-	}
-
-	std::uint8_t generic_pixel::operator[](std::size_t index) const
-	{
-		switch(format_)
-		{
-			case pixel_format::RGBA8:
-				return detail::pixel_get<pixel_format::RGBA8>(buffer_, index);
-			case pixel_format::RGB8:
-				return detail::pixel_get<pixel_format::RGB8>(buffer_, index);
-			case pixel_format::RGB565:
-				return detail::pixel_get<pixel_format::RGB565>(buffer_, index);
-			case pixel_format::A1_RGB5:
-				return detail::pixel_get<pixel_format::A1_RGB5>(buffer_, index);
-			case pixel_format::RGBA4:
-				return detail::pixel_get<pixel_format::RGBA4>(buffer_, index);
-			default: return 0;
-		}
-	}
-
-	const unsigned char *generic_pixel::get_buffer() const
-	{
-		return buffer_;
-	}
-
-	unsigned char *generic_pixel::get_buffer()
-	{
-		return buffer_;
-	}
-
-	std::uint32_t generic_pixel::get_value() const
-	{
-		std::uint32_t result = 0;
-		for (std::size_t i = 0; i < detail::pixel_format_size(format_); ++i)
-		{
-			result |= static_cast<std::uint32_t>(buffer_[i]) << (CHAR_BIT*i);
-		}
-		return result;
-	}
-
 }
+

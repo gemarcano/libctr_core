@@ -133,16 +133,12 @@ namespace ctr_core
 
 		virtual ~surface() = default;
 
-		virtual size_t width() const = 0;
-		virtual size_t height() const = 0;
-		virtual pixel_type get_pixel(size_t x, size_t y) = 0;
-		virtual const pixel_type get_pixel(size_t x, size_t y) const = 0;
+		virtual std::size_t width() const = 0;
+		virtual std::size_t height() const = 0;
+		virtual pixel_type operator()(std::size_t x, std::size_t y) = 0;
+		virtual const pixel_type operator()(std::size_t x, std::size_t y) const = 0;
 		virtual surface& get_screen() = 0;
 		virtual const surface& get_screen() const = 0;
-		virtual pixel_format get_pixel_format() const = 0;
-		virtual size_t pixel_size() const = 0;
-
-		virtual void set_pixel(size_t x, size_t y, const pixel_type& pixel) = 0;
 
 		virtual void clear(const pixel_type& pixel) = 0;
 	};

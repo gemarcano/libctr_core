@@ -1,6 +1,7 @@
 #include <ctr_core/ctr_core_surface.h>
 
 #include <climits>
+#include <cstring>
 
 std::size_t ctr_core_surface_get_width(const void *surface)
 {
@@ -17,11 +18,11 @@ std::size_t ctr_core_surface_get_height(const void *surface)
 std::uint32_t ctr_core_surface_get_pixel(const void *surface, std::size_t x, std::size_t y)
 {
 	const ctr_core::generic_surface& surf = *reinterpret_cast<const ctr_core::generic_surface*>(surface);
-	const ctr_core::generic_pixel pixel = surf.get_pixel(x, y);
+	const ctr_core::generic_pixel pixel = surf(x, y);
 	std::uint32_t result = 0;
-	for (std::size_t i = 0; i < surf.pixel_size(); ++i)
+	for (std::size_t i = 0; i < pixel.size(); ++i)
 	{
-		result |= static_cast<std::uint32_t>(pixel[i]) << (CHAR_BIT*i);
+		result |= static_cast<std::uint32_t>(pixel.data()[i]) << (CHAR_BIT*i);
 	}
 	return result;
 }
@@ -29,7 +30,7 @@ std::uint32_t ctr_core_surface_get_pixel(const void *surface, std::size_t x, std
 void ctr_core_surface_set_pixel(void *surface, std::size_t x, std::size_t y, std::uint32_t pixel)
 {
 	ctr_core::generic_surface& surf = *reinterpret_cast<ctr_core::generic_surface*>(surface);
-	surf.get_pixel(x, y) = pixel;
+	surf(x, y) = reinterpret_cast<unsigned char*>(&pixel);
 }
 
 struct ctr_core_screen *ctr_core_surface_get_screen(void *surface)
@@ -41,7 +42,7 @@ struct ctr_core_screen *ctr_core_surface_get_screen(void *surface)
 void ctr_core_surface_clear(void *surface, std::uint32_t pixel)
 {
 	ctr_core::generic_surface& surf = *reinterpret_cast<ctr_core::generic_surface*>(surface);
-	surf.clear(surf.get_pixel(0, 0) = pixel);
+	surf.clear(surf(0, 0) = reinterpret_cast<unsigned char*>(&pixel));
 }
 
 void ctr_core_surface_draw_bitmap(void *surface, std::size_t x, std::size_t y, std::uint32_t pixel, ctr_core_surface_bitmap *bitmap)
@@ -61,10 +62,39 @@ void ctr_core_surface_draw_bitmap(void *surface, std::size_t x, std::size_t y, s
 			{
 				if (data[byte + width_bytes * j] & (1u << bit))
 				{
-					surf.get_pixel(x + i, y + j) = pixel;
+					surf(x + i, y + j) = reinterpret_cast<unsigned char*>(&pixel);
 				}
 			}
 		}
 	}
+}
+
+namespace ctr_core
+{
+	template<class Pixel>
+	void surface<Pixel>::clear(const pixel_type& pixel)
+	{
+		//Buffer is bottom to top, left to right
+		//For my own sanity, I am defining that the framebuffer pixels are within is
+		//one large array object. This allows for pointer arithmetic.
+		size_t h = height();
+		size_t pixel_size = pixel.size();
+		unsigned char *data = operator()(0, h-1).data();
+		std::size_t offset_to_next_column = h * pixel_size;
+
+		//Write into the first column
+		for (size_t y = 0; y < h; ++y)
+		{
+			operator()(0,y) = pixel;
+		}
+		data += offset_to_next_column;
+
+		for (std::size_t x = 1; x < width(); ++x)
+		{
+			memmove(data, data - offset_to_next_column, offset_to_next_column);
+			data += offset_to_next_column;
+		}
+	}
+
 }
 

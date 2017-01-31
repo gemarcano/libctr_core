@@ -99,34 +99,36 @@ namespace ctr_core
 	public:
 		typedef Pixel pixel_type;
 
-		screen(Pixel (*framebuffer)[Width]);
+		screen(unsigned char *framebuffer);
 		constexpr std::size_t width() const;
 		constexpr std::size_t height() const;
-		Pixel& operator()(std::size_t x, std::size_t y);
-		const Pixel& operator()(std::size_t x, std::size_t y) const;
+		Pixel operator()(std::size_t x, std::size_t y);
+		const Pixel operator()(std::size_t x, std::size_t y) const;
 		screen& get_screen();
 		const screen& get_screen() const;
 		void clear(const Pixel& pixel);
 
 	private:
-		Pixel (*framebuffer)[Width];
+		unsigned char *framebuffer_;
 	};
 
 	class generic_screen : public generic_surface
 	{
 	public:
 		generic_screen(std::uint8_t *framebuffer, std::size_t width, std::size_t height, pixel_format format);
+
 		virtual std::size_t width() const override;
 		virtual std::size_t height() const override;
-		virtual generic_pixel get_pixel(std::size_t x, std::size_t y) override;
-		virtual const generic_pixel get_pixel(std::size_t x, std::size_t y) const override;
-		virtual void set_pixel(std::size_t x, std::size_t y, const pixel_type& pixel) override;
+
+		virtual generic_pixel operator()(std::size_t x, std::size_t y) override;
+		virtual const generic_pixel operator()(std::size_t x, std::size_t y) const override;
+
 		virtual surface& get_screen() override;
 		virtual const surface& get_screen() const override;
+
 		virtual void clear(const generic_pixel& pixel) override;
-		virtual pixel_format get_pixel_format() const override;
-		virtual std::size_t pixel_size() const override;
-	public:
+
+	private:
 		std::uint8_t *framebuffer_;
 		std::size_t width_;
 		std::size_t height_;
