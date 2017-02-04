@@ -59,3 +59,4 @@ namespace ctr_core
 		while (true);
 	}
 }
+

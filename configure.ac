@@ -63,12 +63,17 @@ AS_IF([test "x$enable_thumb" = "xyes"], [
 	AC_SUBST(THUMBFLAGS)
 ])
 
+cflags_save="$CFLAGS"
+cxxflags_save="$CXXFLAGS"
+
 CFLAGS="$MACHINE_CFLAGS $THUMBFLAGS $C11FLAGS $CFLAGS"
 CXXFLAGS="$MACHINE_CFLAGS $THUMBFLAGS $C11FLAGS $CXXFLAGS"
 
 #Make sure the libtool checks happen after C*FLAGS are updated so it picks up
 #those changes.
 LT_INIT
+CFLAGS="$cflags_save"
+CXXFLAGS="$cxxflags_save"
 
 AC_CONFIG_FILES([Makefile src/Makefile libctr_core.pc])
 AC_OUTPUT

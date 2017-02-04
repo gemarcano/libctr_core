@@ -5,9 +5,9 @@ SIZE_OPTIMIZATION = -flto
 AM_CPPFLAGS=$(INCPATHS)
 
 COMMON_FLAGS=-O2 -g -fomit-frame-pointer -ffast-math \
-	$(SIZE_OPTIMIZATION)
+	$(SIZE_OPTIMIZATION) $(MACHINE_CFLAGS) $(THUMBFLAGS) $(C11FLAGS)
 
-AM_CFLAGS= -std=gnu11 $(COMMON_FLAGS) $(WARN_CFLAGS)
+AM_CFLAGS=-std=gnu11 $(COMMON_FLAGS) $(WARN_CFLAGS)
 AM_CXXFLAGS=-std=gnu++14 $(COMMON_FLAGS) $(WARN_CXXFLAGS)
 AM_LDFLAGS=-Wl,--use-blx,--pic-veneer,-q $(WARN_LDFLAGS)
 OCFLAGS=--set-section-flags .bss=alloc,load,contents

@@ -61,7 +61,7 @@ namespace ctr_core
 	}
 
 	template<pixel_format Format>
-	constexpr std::size_t pixel<Format>::size() const
+	constexpr std::size_t pixel<Format>::size()
 	{
 		return detail::pixel_format_size(Format);
 	}

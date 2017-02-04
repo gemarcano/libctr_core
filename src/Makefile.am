@@ -1,7 +1,8 @@
 include $(top_srcdir)/common.mk
 
 lib_LTLIBRARIES = libctr_core.la
-libctr_core_la_CFLAGS=$(AM_CFLAGS) $(C9FLAGS)
+libctr_core_la_CFLAGS=$(AM_CFLAGS)
+libctr_core_la_CXXFLAGS=$(AM_CXXFLAGS)
 libctr_core_la_CCASFLAGS = -I$(top_srcdir)/data
 libctr_core_la_SOURCES = ctr_core_pxi.c ctr_core_screen.cpp ctr_core_i2c.c ctr_core_system.cpp $(top_srcdir)/data/ctr_core_font_data.s ctr_core_freetype.c ctr_core_console.cpp ctr_core_hid.c ctr_core_circular_buffer.c ctr_core_headers.c ctr_core_firm.c ctr_core_window.cpp ctr_core_led.c ctr_core_surface.cpp ctr_core_pixel.cpp
 libctr_core_la_LIBADD = $(AM_LIBADD) -lfreetype

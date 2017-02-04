@@ -34,7 +34,7 @@ namespace ctr_core
 		std::uint8_t operator[](std::size_t index) const;
 		pixel& operator=(const unsigned char *data);
 		pixel& operator=(const pixel& pixel);
-		constexpr std::size_t size() const;
+		static constexpr std::size_t size();
 
 	private:
 		unsigned char *data_;

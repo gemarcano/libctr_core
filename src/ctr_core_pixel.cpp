@@ -7,7 +7,7 @@ namespace ctr_core
 	class generic_pixel_impl
 	{
 	public:
-		~generic_pixel_impl() = default;
+		virtual ~generic_pixel_impl() = default;
 		virtual std::uint8_t at(unsigned char *data, std::size_t index) const = 0;
 		virtual std::size_t size() const = 0;
 		virtual generic_pixel_impl& set(unsigned char *data, const unsigned char *src) = 0;
@@ -114,7 +114,6 @@ namespace ctr_core
 		template<>
 		std::uint8_t pixel_get<pixel_format::RGB565>(const std::uint8_t *data, std::size_t index)
 		{
-			std::uint8_t result;
 			switch (index)
 			{
 				case 0:
