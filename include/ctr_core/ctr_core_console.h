@@ -22,11 +22,14 @@ extern "C" {
 
 /**	@brief Initializes the console subsystem.
  *
+ *	@param[in] surface Surface to use to draw console to.
+ *	@param[in] flush Function to call to ensure flushing to surface happens.
+ *
  *	@returns 0 on success, anything else on an error. This function should
  *		suceed. If it does not, this means that the underling libc and graphics
  *		handling for libctr9 is broken.
  */
-int ctr_core_console_initialize(ctr_core_surface *surface);
+int ctr_core_console_initialize(ctr_core_surface *surface, void (*flush)(void));
 
 typedef struct
 {

@@ -49,9 +49,11 @@ static const devoptab_t tab =
 };
 
 static ctr_core_console console;
+static void (*flush_func)(void);
 
-int ctr_core_console_initialize(ctr_core_surface *surface)
+int ctr_core_console_initialize(ctr_core_surface *surface, void (*flush)(void))
 {
+	flush_func = flush;
 	devoptab_list[STD_OUT] = &tab;
 	devoptab_list[STD_ERR] = &tab;
 	setvbuf(stdout, NULL , _IONBF, 0);
@@ -491,6 +493,7 @@ static ssize_t ctr_core_console_write_r(struct _reent *r, void *fd, const char *
 			ctr_core_console_draw(ptr[i]);
 		}
 	}
+	flush_func();
 	return (ssize_t)len;
 }
 
