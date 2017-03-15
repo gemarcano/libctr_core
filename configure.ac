@@ -26,11 +26,6 @@ AC_TYPE_UINT8_T
 AC_CHECK_FUNCS([malloc memmove memset strchr strtol])
 
 AX_CFLAGS_WARN_ALL
-AX_COMPILER_FLAGS([-Wpedantic -Wall -Wextra -Wcast-align -Wcast-qual\
- -Wdisabled-optimization -Wformat=2 -Winit-self -Wlogical-op\
- -Wmissing-declarations -Wmissing-include-dirs -Wredundant-decls\
- -Wshadow -Wsign-conversion -Wstrict-overflow=5 -Wswitch-default\
- -Wundef -Wno-unused])
 AX_CHECK_COMPILE_FLAG(-Wno-declaration-after-statement,
 	[WARN_CFLAGS="$WARN_CFLAGS -Wno-declaration-after-statement -Wno-error=declaration-after-statement"], [], [], [])
 
