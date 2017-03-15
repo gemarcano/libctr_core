@@ -8,5 +8,5 @@ Description: Baremetal ARM library for the Nintendo 3DS, used by libctr9 and lib
 URL: https://github.com/gemarcano/@PACKAGE_NAME@
 Version: @VERSION@
 Libs: -L$(libdir) -lctr_core
-Cflags: -I(includedir)
+Cflags: -I$(includedir)
 
