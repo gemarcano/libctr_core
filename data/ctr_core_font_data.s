@@ -12,7 +12,7 @@ ctr_core_font_data_end:
 
 .align 4
 ctr_core_font_begin:
-.incbin "font.pcf"
+.incbin "data/font.pcf"
 ctr_core_font_end:
 
 .align 4
