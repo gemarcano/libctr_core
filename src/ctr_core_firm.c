@@ -7,7 +7,7 @@ A += sizeof((O)->E);
 
 void ctr_core_firm_section_header_load(ctr_core_firm_section_header *header, const void *data)
 {
-	const uint8_t *d = data;
+	const uint8_t *d = (const uint8_t*)data;
 	LOAD(header, offset, d);
 	LOAD(header, load_address, d);
 	LOAD(header, size, d);
@@ -17,7 +17,7 @@ void ctr_core_firm_section_header_load(ctr_core_firm_section_header *header, con
 
 void ctr_core_firm_header_load(ctr_core_firm_header *header, const void *data)
 {
-	const uint8_t *d = data;
+	const uint8_t *d = (const uint8_t*)data;
 	LOAD(header, magic, d);
 	LOAD(header, reserved1, d);
 	LOAD(header, arm11_entry, d);
@@ -33,7 +33,7 @@ void ctr_core_firm_header_load(ctr_core_firm_header *header, const void *data)
 
 void ctr_core_arm9bin_header_load(ctr_core_arm9bin_header *header, const void *data)
 {
-	const uint8_t *d = data;
+	const uint8_t *d = (const uint8_t*)data;
 	LOAD(header, enc_keyx, d);
 	LOAD(header, keyy, d);
 	LOAD(header, ctr, d);
@@ -43,4 +43,3 @@ void ctr_core_arm9bin_header_load(ctr_core_arm9bin_header *header, const void *d
 	LOAD(header, hardware_debug, d);
 	LOAD(header, enc_key16x, d);
 }
-

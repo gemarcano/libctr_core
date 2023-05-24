@@ -55,7 +55,7 @@ inline bool ctr_core_i2cGetResult(uint8_t bus_id) {
 }
 
 void ctr_core_i2cStop(uint8_t bus_id, uint8_t arg0) {
-    *ctr_core_i2cGetCntReg(bus_id) = (arg0 << 5) | 0xC0;
+    *ctr_core_i2cGetCntReg(bus_id) = (uint8_t)((arg0 << 5) | 0xC0);
     ctr_core_i2cWaitBusy(bus_id);
     *ctr_core_i2cGetCntReg(bus_id) = 0xC5;
 }

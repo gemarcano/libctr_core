@@ -7,7 +7,7 @@
 void ctr_core_circular_buffer_initialize(ctr_core_circular_buffer *buffer, size_t size)
 {
 	buffer->size = size;
-	buffer->buffer = malloc(size);
+	buffer->buffer = (unsigned char *)malloc(size);
 	buffer->count = 0;
 	buffer->begin = buffer->buffer;
 	buffer->end = buffer->buffer;

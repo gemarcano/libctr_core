@@ -43,6 +43,12 @@ static const devoptab_t tab =
 	NULL,
 	NULL,
 	NULL,
+	NULL,
+	NULL,
+	NULL,
+	NULL,
+	NULL,
+	NULL,
 	NULL
 };
 
@@ -86,7 +92,7 @@ static void pixel_set(void *buffer, uint32_t pixel, size_t pixel_size, size_t co
 	for (size_t i = 0; i < count; ++i)
 	{
 		for (size_t j = 0; j < pixel_size; ++j)
-			((char*)buffer)[i*pixel_size + j] = pixel >> (j*CHAR_BIT);
+			((char*)buffer)[i*pixel_size + j] = (char)(pixel >> (j*CHAR_BIT));
 	}
 }
 
@@ -117,13 +123,13 @@ void ctr_core_console_draw(char c)
 	if (c == '\n' || (console.xpos + cwidth) > console.width)
 	{
 		console.xpos = 0;
-		console.ypos += cheight;
+		console.ypos += (uint16_t)cheight;
 	}
 
 	if (console.ypos + cheight >= console.height)
 	{
 		draw_shift_up();
-		console.ypos -= cheight;
+		console.ypos -= (uint16_t)cheight;
 	}
 
 	if (!(c == '\r' || c == '\n'))
@@ -131,7 +137,7 @@ void ctr_core_console_draw(char c)
 		//Can I assume bit->top is always positive for horizontal layouts?
 		size_t off = (ctr_core_console_get_char_height() - (unsigned int)(bit->top));
 		ctr_core_freetype_draw(&console.screen, console.xpos, console.ypos + off, c, console.fg, console.bg);
-		console.xpos += cwidth;
+		console.xpos += (uint16_t)cwidth;
 	}
 
 	if (ctr_core_circular_buffer_count(&console.buffer) == ctr_core_circular_buffer_size(&console.buffer))
@@ -168,7 +174,7 @@ typedef struct
 static csi_state do_csi_initial(csi_data *data, const char *str, size_t i)
 {
 	memset(data, 0, sizeof(*data));
-	if (isdigit(str[i]))
+	if (isdigit((unsigned char)str[i]))
 	{
 		data->params[0] = str+i;
 		return CSI_PARAMETER;
@@ -188,7 +194,7 @@ static csi_state do_csi_parameter(csi_data *data, const char *str, size_t i)
 	{
 		return CSI_NEW_PARAMETER;
 	}
-	else if (isdigit(str[i]))
+	else if (isdigit((unsigned char)str[i]))
 	{
 		return CSI_PARAMETER;
 	}
@@ -203,7 +209,7 @@ static csi_state do_csi_parameter(csi_data *data, const char *str, size_t i)
 
 static csi_state do_csi_new_parameter(csi_data *data, const char *str, size_t i)
 {
-	if (isdigit(str[i]))
+	if (isdigit((unsigned char)str[i]))
 	{
 		if (data->params[1] == NULL)
 		{
@@ -299,7 +305,7 @@ static void execute_command(const csi_data *data)
 	{
 		case 'A':
 		{
-			uint16_t cheight = (size_t)ctr_core_console_get_char_height();
+			uint16_t cheight = (uint16_t)ctr_core_console_get_char_height();
 			size_t param = extract_param(data->params[0], 1);
 
 			size_t pos = console.ypos > (param*cheight) ? console.ypos-(param*cheight) : 0;
@@ -309,7 +315,7 @@ static void execute_command(const csi_data *data)
 		break;
 		case 'B':
 		{
-			uint16_t cheight = ctr_core_console_get_char_height();
+			uint16_t cheight = (uint16_t)ctr_core_console_get_char_height();
 			size_t param = extract_param(data->params[0], 1);
 
 			size_t pos = console.ypos + param * cheight;
@@ -341,7 +347,7 @@ static void execute_command(const csi_data *data)
 
 		case 'E':
 		{
-			uint16_t cheight = ctr_core_console_get_char_height();
+			uint16_t cheight = (uint16_t)ctr_core_console_get_char_height();
 			size_t param = extract_param(data->params[0], 1);
 
 			size_t pos = console.ypos + param*cheight;
@@ -352,7 +358,7 @@ static void execute_command(const csi_data *data)
 
 		case 'F':
 		{
-			uint16_t cheight = ctr_core_console_get_char_height();
+			uint16_t cheight = (uint16_t)ctr_core_console_get_char_height();
 			size_t param = extract_param(data->params[0], 1);
 
 			size_t pos = console.ypos > param*cheight ? console.ypos - param*cheight : 0;
@@ -378,7 +384,7 @@ static void execute_command(const csi_data *data)
 			size_t param1 = extract_param(data->params[0], 1);
 			size_t param2 = extract_param(data->params[1], 1);
 			unsigned int cwidth = (unsigned int)ctr_core_console_get_char_width('T'); //uh,FIXME, I need to keep track of the text contents...
-			uint16_t cheight = ctr_core_console_get_char_height();
+			uint16_t cheight = (uint16_t)ctr_core_console_get_char_height();
 
 			size_t posx = param1*cwidth < console.width ? param1*cwidth : console.width;
 			size_t posy = param2*cheight < console.height ? param2*cheight : console.height;
@@ -458,6 +464,8 @@ static size_t process_csi(const char *str, size_t len)
 
 static ssize_t ctr_core_console_write_r(struct _reent *r, void *fd, const char *ptr, size_t len)
 {
+	(void)r;
+	(void)fd;
 	for (size_t i = 0; i < len; ++i)
 	{
 		if (ptr[i] == 0x1B)

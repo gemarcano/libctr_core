@@ -6,7 +6,7 @@ ctr_core_screen ctr_screen_bottom;
 
 void ctr_core_screen_enable_backlight(ctr_core_screen_enum aScreens)
 {
-	int data = 0;
+	uint8_t data = 0;
 	if (aScreens & CTR_SCREEN_TOP)
 	{
 		data |= 1 << 5;
@@ -22,7 +22,7 @@ void ctr_core_screen_enable_backlight(ctr_core_screen_enum aScreens)
 
 void ctr_core_screen_disable_backlight(ctr_core_screen_enum aScreens)
 {
-	int data = 0;
+	uint8_t data = 0;
 	if (aScreens & CTR_SCREEN_TOP)
 	{
 		data |= 1 << 4;
@@ -95,7 +95,7 @@ void ctr_core_screen_set_pixel(ctr_core_screen *screen, size_t x, size_t y, uint
 	uint8_t *p = ctr_core_screen_get_pixel_ptr(screen, x, y);
 	for (size_t i = 0; i < screen->pixel_size; ++i)
 	{
-		p[i] = pixel >> (i*8u);
+		p[i] = (uint8_t)(pixel >> (i*8u));
 	}
 }
 
@@ -103,7 +103,7 @@ void ctr_core_screen_draw_bitmap(ctr_core_screen *screen, size_t x, size_t y, ui
 {
 	if (bitmap->width && bitmap->height)
 	{
-		uint8_t *data = bitmap->data;
+		uint8_t *data = (uint8_t*)bitmap->data;
 		size_t width_bytes = bitmap->width / 8u;
 		if (bitmap->width % 8) width_bytes++;
 
