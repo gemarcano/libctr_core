@@ -1,47 +1,40 @@
-#pragma once
+// SPDX-License-Identifier: GPL-2.0-or-later
+// Copyright: Gabriel Marcano, 2023
+
+#ifndef CTR_CORE_I2C_H_
+#define CTR_CORE_I2C_H_
 
 #include <stdint.h>
 #include <stddef.h>
-#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#define I2C1_REG_OFF 0x10161000
-#define I2C2_REG_OFF 0x10144000
-#define I2C3_REG_OFF 0x10148000
+#define CTR_I2C1_BASE (0x10161000u)
+#define CTR_I2C2_BASE (0x10144000u)
+#define CTR_I2C3_BASE (0x10148000u)
 
-#define I2C_REG_DATA  0
-#define I2C_REG_CNT   1
-#define I2C_REG_CNTEX 2
-#define I2C_REG_SCL   4
+#define CTR_I2C_REG(BASE, OFFSET) (((volatile uint8_t*)(BASE))[OFFSET])
+#define CTR_I2C_DATA_OFFSET (0)
+#define CTR_I2C_CNT_OFFSET (1)
+#define CTR_I2C_CNTEX_OFFSET (2)
+#define CTR_I2C_SCL_OFFSET (4)
 
-#define I2C_DEV_MCU  3
-#define I2C_DEV_GYRO 10
-#define I2C_DEV_IR   13
+typedef enum
+{
+	CTR_I2C1,
+	CTR_I2C2,
+	CTR_I2C3
+} ctr_core_i2c_bus;
 
-uint8_t ctr_core_i2cGetDeviceBusId(uint8_t device_id);
-uint8_t ctr_core_i2cGetDeviceRegAddr(uint8_t device_id);
-
-volatile uint8_t* ctr_core_i2cGetDataReg(uint8_t bus_id);
-volatile uint8_t* ctr_core_i2cGetCntReg(uint8_t bus_id);
-
-void ctr_core_i2cWaitBusy(uint8_t bus_id);
-bool ctr_core_i2cGetResult(uint8_t bus_id);
-uint8_t ctr_core_i2cGetData(uint8_t bus_id);
-void ctr_core_i2cStop(uint8_t bus_id, uint8_t arg0);
-
-bool ctr_core_i2cSelectDevice(uint8_t bus_id, uint8_t dev_reg);
-bool ctr_core_i2cSelectRegister(uint8_t bus_id, uint8_t reg);
-
-uint8_t ctr_core_i2cReadRegister(uint8_t dev_id, uint8_t reg);
-bool ctr_core_i2cWriteRegister(uint8_t dev_id, uint8_t reg, uint8_t data);
-
-bool ctr_core_i2cReadRegisterBuffer(uint8_t dev_id, uint8_t reg, uint8_t *buffer, size_t buf_size);
-bool ctr_core_i2cWriteRegisterBuffer(uint8_t dev_id, uint8_t reg, const uint8_t *buffer, size_t buf_size);
+int ctr_core_i2c_write(ctr_core_i2c_bus bus, uint8_t device, uint8_t register_, const uint8_t *data, size_t amount);
+int ctr_core_i2c_write_one(ctr_core_i2c_bus bus, uint8_t device, uint8_t register_, uint8_t data);
+int ctr_core_i2c_read(ctr_core_i2c_bus bus, uint8_t device, uint8_t register_, uint8_t *data, size_t amount);
+int ctr_core_i2c_read_one(ctr_core_i2c_bus bus, uint8_t device, uint8_t register_, uint8_t *data);
 
 #ifdef __cplusplus
 }
 #endif
 
+#endif//CTR_CORE_I2C_H_

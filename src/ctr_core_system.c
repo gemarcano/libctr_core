@@ -34,13 +34,13 @@ bool ctr_core_detect_a9lh_entry(void)
 
 noreturn void ctr_core_system_poweroff(void)
 {
-	ctr_core_i2cWriteRegister(I2C_DEV_MCU, 0x20, 1);
+	ctr_core_i2c_write_one(CTR_I2C2, 0x4A, 0x20, 1);
 	while (true);
 }
 
 noreturn void ctr_core_system_reset(void)
 {
-	ctr_core_i2cWriteRegister(I2C_DEV_MCU, 0x20, 1 << 2);
+	ctr_core_i2c_write_one(CTR_I2C2, 0x4A, 0x20, 1 << 2);
 	while (true);
 }
 

@@ -16,8 +16,7 @@ void ctr_core_screen_enable_backlight(ctr_core_screen_enum aScreens)
 	{
 		data |= 1 << 3;
 	}
-
-	ctr_core_i2cWriteRegister(I2C_DEV_MCU, 0x22, data);
+	ctr_core_i2c_write_one(CTR_I2C2, 0x4A, 0x22, data);
 }
 
 void ctr_core_screen_disable_backlight(ctr_core_screen_enum aScreens)
@@ -32,7 +31,7 @@ void ctr_core_screen_disable_backlight(ctr_core_screen_enum aScreens)
 	{
 		data |= 1 << 2;
 	}
-	ctr_core_i2cWriteRegister(I2C_DEV_MCU, 0x22, data);
+	ctr_core_i2c_write_one(CTR_I2C2, 0x4A, 0x22, data);
 }
 
 void ctr_core_screen_initialize(ctr_core_screen *screen, uint8_t *framebuffer, size_t width, size_t height, ctr_core_screen_pixel format)
